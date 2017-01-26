@@ -37,7 +37,6 @@ public class TimestampFormatter {
      * @throws ParseException if the provided string does not respect the expected format.
      */
     public Timestamp parse(String formattedString) throws ParseException {
-        System.out.println(format.parse(formattedString));
         return new Timestamp(format.parse(formattedString).toInstant());
     }
 
