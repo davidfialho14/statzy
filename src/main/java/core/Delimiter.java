@@ -11,6 +11,8 @@ public enum Delimiter {
     SEMI_COLON("Semicolon", ";"),
     TAB("Tab", "\t");
 
+    public static Delimiter DEFAULT = SPACE;
+
     private final String name;
     private final String character;
 
@@ -19,12 +21,16 @@ public enum Delimiter {
         this.character = character;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getCharacter() {
         return character;
     }
 
     @Override
     public String toString() {
-        return name;
+        return character;
     }
 }
