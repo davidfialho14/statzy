@@ -112,14 +112,17 @@ public class DataRecordFactory {
         private int dateColumn = 0;
         private int timeColumn = 1;
         private Set<Integer> ignoredColumns = new HashSet<>();
-        private String timestampPattern = "dd/MM/yyyy HH:mm:ss";
+        private String datePattern = "dd/MM/yyyy";
+        private String timePattern = "HH:mm:ss";
+        private Delimiter delimiter = Delimiter.DEFAULT;    // delimiter for the date and time patterns
+        private boolean timeBeforeDate = false;             // indicates if the time comes before the date
 
         // use the factory method above
         private Builder(int columnCount) {
             this.columnCount = columnCount;
         }
 
-        public Builder withDateColumn(int column) {
+        public Builder withDateInColumn(int column) {
 
             if (column >= columnCount) {
                 throw new IllegalArgumentException("Date column number can not be higher than the total " +
@@ -130,7 +133,7 @@ public class DataRecordFactory {
             return this;
         }
 
-        public Builder withTimeColumn(int column) {
+        public Builder withTimeInColumn(int column) {
 
             if (column >= columnCount) {
                 throw new IllegalArgumentException("Time column number can not be higher than the total " +
@@ -141,17 +144,46 @@ public class DataRecordFactory {
             return this;
         }
 
+        public Builder withDateAndTimeInColumn(int column) {
+            withDateInColumn(column);
+            withTimeInColumn(column);
+            return this;
+        }
+
+        public Builder withDatePattern(String pattern) {
+            datePattern = pattern;
+            return this;
+        }
+
+        public Builder withTimePattern(String pattern) {
+            timePattern = pattern;
+            return this;
+        }
+
+        public Builder delimitedBy(Delimiter delimiter) {
+            this.delimiter = delimiter;
+            return this;
+        }
+
+        public Builder withTimeBeforeDate() {
+            timeBeforeDate = true;
+            return this;
+        }
+
         public Builder ignoreColumns(Integer... columns) {
             Collections.addAll(ignoredColumns, columns);
             return this;
         }
 
-        public Builder withTimestampPattern(String pattern) {
-            timestampPattern = pattern;
-            return this;
-        }
-
         public DataRecordFactory build() {
+
+            String timestampPattern;
+            if (timeBeforeDate) {
+                timestampPattern = timePattern + delimiter + datePattern;
+            } else {
+                timestampPattern = datePattern + delimiter + timePattern;
+            }
+
             return new DataRecordFactory(columnCount, dateColumn, timeColumn, ignoredColumns,
                     TimestampFormatter.withPattern(timestampPattern));
         }

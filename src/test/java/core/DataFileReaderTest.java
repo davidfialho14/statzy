@@ -5,8 +5,10 @@ import org.junit.Test;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import static core.DataRecordFactory.factoryExpectingItemCountPerRecord;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,7 +16,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class DataFileReaderTest {
 
     private DataFileReader dataFileReader;
-    private final DataRecordFactory dataRecordFactory = null;
+    private final DataRecordFactory dataRecordFactory = factoryExpectingItemCountPerRecord(4)
+            .withDateInColumn(0)
+            .withTimeInColumn(1)
+            .build();
 
     private static Reader fakeFile(String... lines) {
         // join all lines in the file with a new line
@@ -27,14 +32,15 @@ public class DataFileReaderTest {
     @Test
     public void read_FileWith2DataLines_Reads2DataRecords() throws Exception {
         Reader file = fakeFile(
-                "09/08/2016, 00:00:00,   176,   186",
-                "09/08/2016, 00:00:01,   123,   144"
-        );
-
+                "09/08/2016, 11:22:00,   176,   186",
+                "09/08/2016, 11:22:30,   123,   144");
         dataFileReader = new DataFileReader(file, dataRecordFactory);
 
+        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 0);
+        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+
         assertThat(dataFileReader.read(),
-                is(nullValue()));
+                is(new DataRecord(expectedTimestamp, expectedValues)));
     }
 
     @Test

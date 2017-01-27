@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static core.DataRecordFactory.factoryExpectingItemCountPerRecord;
-import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -46,8 +45,8 @@ public class DataRecordFactoryTest {
     @Test
     public void getDataRecord_ValidDateAndTimeInDifferentColumnsAndTwoValueColumns_GetsCorrectDataRecord() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(4)
-                .withDateColumn(0)
-                .withTimeColumn(1)
+                .withDateInColumn(0)
+                .withTimeInColumn(1)
                 .build();
 
         Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
@@ -60,8 +59,8 @@ public class DataRecordFactoryTest {
     @Test
     public void getDataRecord_SetFactoryToExpect4ColumnsButRecordHasOnly3_RaisesParseException() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(4)
-                .withDateColumn(0)
-                .withTimeColumn(1)
+                .withDateInColumn(0)
+                .withTimeInColumn(1)
                 .build();
 
         thrown.expect(ParseException.class);
@@ -72,8 +71,8 @@ public class DataRecordFactoryTest {
     @Test
     public void getDataRecord_FromRawRecordWithInvalidDate_RaisesParseException() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(4)
-                .withDateColumn(0)
-                .withTimeColumn(1)
+                .withDateInColumn(0)
+                .withTimeInColumn(1)
                 .build();
 
         thrown.expect(ParseException.class);
@@ -84,8 +83,8 @@ public class DataRecordFactoryTest {
     @Test
     public void getDataRecord_ValueIsNotADouble_RaisesParseException() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(4)
-                .withDateColumn(0)
-                .withTimeColumn(1)
+                .withDateInColumn(0)
+                .withTimeInColumn(1)
                 .build();
 
         thrown.expect(ParseException.class);
@@ -96,8 +95,8 @@ public class DataRecordFactoryTest {
     @Test
     public void getDataRecord_FromRecordWith4ColumnsWhenFactoryExpects3_ThrowsParseException() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(3)
-                .withDateColumn(0)
-                .withTimeColumn(1)
+                .withDateInColumn(0)
+                .withTimeInColumn(1)
                 .build();
 
         thrown.expect(ParseException.class);
@@ -108,8 +107,7 @@ public class DataRecordFactoryTest {
     @Test
     public void getDataRecord_DateAndTimeInSameColumns_GetsRecordWithCorrectTimestamp() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(3)
-                .withDateColumn(0)
-                .withTimeColumn(0)
+                .withDateAndTimeInColumn(0)
                 .build();
 
         Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
@@ -120,10 +118,38 @@ public class DataRecordFactoryTest {
     }
 
     @Test
+    public void getDataRecord_HavingTimeBeforeDateInTheSameColumn_GetsRecordWithCorrectTimestamp() throws Exception {
+        dataRecordFactory = factoryExpectingItemCountPerRecord(3)
+                .withDateAndTimeInColumn(0)
+                .withTimeBeforeDate()
+                .build();
+
+        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
+        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+
+        assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("11:22:33 09/08/2016", "176", "186")),
+                is(new DataRecord(expectedTimestamp, expectedValues)));
+    }
+
+    @Test
+    public void getDataRecord_HavingTimeAndDateInTheSameColumnDelimitedByTab_GetsRecordWithCorrectTimestamp() throws Exception {
+        dataRecordFactory = factoryExpectingItemCountPerRecord(3)
+                .withDateAndTimeInColumn(0)
+                .delimitedBy(Delimiter.TAB)
+                .build();
+
+        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
+        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+
+        assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("09/08/2016\t11:22:33", "176", "186")),
+                is(new DataRecord(expectedTimestamp, expectedValues)));
+    }
+
+    @Test
     public void constructor_SetFactoryWithDateColumnOverTheColumnCount_RaisesParseException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         factoryExpectingItemCountPerRecord(4)
-                .withDateColumn(4)
+                .withDateInColumn(4)
                 .build();
     }
 
