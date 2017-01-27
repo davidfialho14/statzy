@@ -16,13 +16,13 @@ public class DataRecordFactory {
     private final Set<Integer> ignoredColumns;
     private final TimestampFormatter formatter;
 
-    public DataRecordFactory(int columnCount, int dateColumn, int timeColumn,
+    /**
+     * The constructor should not be used by client. Instead use the builder class starting with the
+     * factory factory method {@link #factoryExpectingItemCountPerRecord(int)}.
+     * The constructor does not check the arguments. Expects the builder class to do it.
+     */
+    private DataRecordFactory(int columnCount, int dateColumn, int timeColumn,
                              Collection<Integer> ignoredColumns, TimestampFormatter formatter) {
-
-        if (dateColumn >= columnCount || timeColumn >= columnCount) {
-            throw new IllegalArgumentException("Date/time column number is higher then the number of " +
-                    "expected columns");
-        }
 
         this.columnCount = columnCount;
         this.dateColumn = dateColumn;
@@ -75,6 +75,87 @@ public class DataRecordFactory {
         }
 
         return new DataRecord(timestamp, values);
+    }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     *  Builder class
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * Factory method to create a builder for a data record factory. Always use this method to start
+     * building a new data record factory.
+     *
+     * @param columnCount   number of items expected in a record (includes date, time, and ignored columns).
+     * @return builder to build a configure the data record factory.
+     */
+    public static Builder factoryExpectingItemCountPerRecord(int columnCount) {
+        return new Builder(columnCount);
+    }
+
+    /**
+     * Builder class for the DataRecordFactory.
+     * Mandatory parameters:
+     *  - column count
+     *
+     * Optional parameters:
+     *  - date column: default is 0
+     *  - time column: default is 1
+     *  - ignored columns: default is an empty list
+     *  - timestamp pattern: default 'dd/MM/yyyy HH:mm:ss'
+     */
+    public static class Builder {
+
+        private final int columnCount;
+
+        private int dateColumn = 0;
+        private int timeColumn = 1;
+        private Set<Integer> ignoredColumns = new HashSet<>();
+        private String timestampPattern = "dd/MM/yyyy HH:mm:ss";
+
+        // use the factory method above
+        private Builder(int columnCount) {
+            this.columnCount = columnCount;
+        }
+
+        public Builder withDateColumn(int column) {
+
+            if (column >= columnCount) {
+                throw new IllegalArgumentException("Date column number can not be higher than the total " +
+                        "number of columns");
+            }
+
+            dateColumn = column;
+            return this;
+        }
+
+        public Builder withTimeColumn(int column) {
+
+            if (column >= columnCount) {
+                throw new IllegalArgumentException("Time column number can not be higher than the total " +
+                        "number of columns");
+            }
+
+            timeColumn = column;
+            return this;
+        }
+
+        public Builder ignoreColumns(Integer... columns) {
+            Collections.addAll(ignoredColumns, columns);
+            return this;
+        }
+
+        public Builder withTimestampPattern(String pattern) {
+            timestampPattern = pattern;
+            return this;
+        }
+
+        public DataRecordFactory build() {
+            return new DataRecordFactory(columnCount, dateColumn, timeColumn, ignoredColumns,
+                    TimestampFormatter.withPattern(timestampPattern));
+        }
+
     }
 
 }
