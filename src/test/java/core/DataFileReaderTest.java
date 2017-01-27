@@ -1,9 +1,12 @@
 package core;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +17,9 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DataFileReaderTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private DataFileReader dataFileReader;
     private final DataRecordFactory dataRecordFactory = factoryExpectingItemCountPerRecord(4)
@@ -78,6 +84,22 @@ public class DataFileReaderTest {
                 is(new DataRecord(expectedFirstRecordsTimestamp, Arrays.asList(176.0, 186.0))));
         assertThat(dataFileReader.read(),
                 is(new DataRecord(expectedSecondRecordsTimestamp, Arrays.asList(123.0, 144.0))));
+    }
+
+    @Test
+    public void
+    read_FileWith2DataLinesAndTimestampInSecondLinePredatesFirstLine_ThrowsParseException() throws Exception {
+        Reader file = fakeFile(
+                "09/08/2016, 11:22:30,   176,   186",
+                "",
+                "09/08/2016, 11:22:00,   123,   144");
+        dataFileReader = new DataFileReader(file, dataRecordFactory);
+        dataFileReader.read();
+
+        thrown.expect(ParseException.class);
+        thrown.expectMessage("Timestamp in line 3 predates the timestamp in the previous record");
+
+        dataFileReader.read();
     }
 
 }

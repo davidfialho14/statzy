@@ -17,6 +17,8 @@ public class DataFileReader implements Closeable {
     private final Iterator<CSVRecord> recordIterator;
     private final DataRecordFactory dataRecordFactory;
 
+    private Timestamp previousTimestamp = new Timestamp(0, 0, 0, 0, 0, 0);
+
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
      *  Constructors
@@ -51,7 +53,8 @@ public class DataFileReader implements Closeable {
      * @return the next data record in the file or null if the file does not have anymore non-empty lines.
      * @throws ParseException if the record is missing the timestamp (missing the date or time), or
      * if at least one of the values is not a double value, or if the number of values is not the expected,
-     * or if fails to parse date and/or time.
+     * or if fails to parse date and/or time, of the timestamp of the record predates the timestamp of the
+     * previous record.
      */
     public DataRecord read() throws ParseException {
         DataRecord record = null;
@@ -59,7 +62,16 @@ public class DataFileReader implements Closeable {
         while (recordIterator.hasNext() && record == null) {
 
             try {
-                record = dataRecordFactory.getDataRecord(RawRecord.wrap(recordIterator.next()));
+                RawRecord rawRecord = RawRecord.wrap(recordIterator.next());
+                record = dataRecordFactory.getDataRecord(rawRecord);
+
+                if (record.getTimestamp().predates(previousTimestamp)) {
+                    throw new ParseException("Timestamp in line " + rawRecord.getRecordNumber() +
+                            " predates the timestamp in the previous record", rawRecord.getRecordNumber());
+                }
+
+                previousTimestamp = record.getTimestamp();
+
             } catch (EmptyRecordException e) {
                 // ignore empty records
             }

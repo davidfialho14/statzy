@@ -7,7 +7,7 @@ import java.util.GregorianCalendar;
 /**
  * Encapsulates the implementation used to represent the timestamps of each data record.
  */
-public class Timestamp {
+public class Timestamp implements Comparable<Timestamp> {
 
     // Timestamp uses Java's Instant class underneath to represent the timestamp instant
     final Instant instant;  // should only be accessed by the TimestampFormatter class
@@ -35,6 +35,21 @@ public class Timestamp {
     public Timestamp(int year, int month, int day, int hour, int minute, int second) {
         Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
         instant = calendar.toInstant();
+    }
+
+    /**
+     * Checks if the timestamp predates another timestamp.
+     *
+     * @param other other timestamp.
+     * @return true if the timestamp predates the other timestamp.
+     */
+    public boolean predates(Timestamp other) {
+        return this.compareTo(other) < 0;
+    }
+
+    @Override
+    public int compareTo(Timestamp other) {
+        return this.instant.compareTo(other.instant);
     }
 
     @Override
