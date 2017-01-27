@@ -36,11 +36,13 @@ public class DataFileReaderTest {
                 "09/08/2016, 11:22:30,   123,   144");
         dataFileReader = new DataFileReader(file, dataRecordFactory);
 
-        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 0);
-        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+        Timestamp expectedFirstRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 0);
+        Timestamp expectedSecondRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 30);
 
         assertThat(dataFileReader.read(),
-                is(new DataRecord(expectedTimestamp, expectedValues)));
+                is(new DataRecord(expectedFirstRecordsTimestamp, Arrays.asList(176.0, 186.0))));
+        assertThat(dataFileReader.read(),
+                is(new DataRecord(expectedSecondRecordsTimestamp, Arrays.asList(123.0, 144.0))));
     }
 
     @Test
@@ -59,6 +61,23 @@ public class DataFileReaderTest {
 
         assertThat(dataFileReader.read(),
                 is(nullValue()));
+    }
+
+    @Test
+    public void read_FileWith2DataLinesWithAnEmptyLineBetween_Reads2DataRecordsAndIgnoresEmptyLine() throws Exception {
+        Reader file = fakeFile(
+                "09/08/2016, 11:22:00,   176,   186",
+                "",
+                "09/08/2016, 11:22:30,   123,   144");
+        dataFileReader = new DataFileReader(file, dataRecordFactory);
+
+        Timestamp expectedFirstRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 0);
+        Timestamp expectedSecondRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 30);
+
+        assertThat(dataFileReader.read(),
+                is(new DataRecord(expectedFirstRecordsTimestamp, Arrays.asList(176.0, 186.0))));
+        assertThat(dataFileReader.read(),
+                is(new DataRecord(expectedSecondRecordsTimestamp, Arrays.asList(123.0, 144.0))));
     }
 
 }

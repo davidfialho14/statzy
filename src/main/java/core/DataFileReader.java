@@ -56,8 +56,13 @@ public class DataFileReader implements Closeable {
     public DataRecord read() throws ParseException {
         DataRecord record = null;
 
-        if (recordIterator.hasNext()) {
-            record = dataRecordFactory.getDataRecord(new RawRecord(recordIterator.next()));
+        while (recordIterator.hasNext() && record == null) {
+
+            try {
+                record = dataRecordFactory.getDataRecord(RawRecord.wrap(recordIterator.next()));
+            } catch (EmptyRecordException e) {
+                // ignore empty records
+            }
         }
 
         return record;
@@ -84,6 +89,23 @@ public class DataFileReader implements Closeable {
 
         private RawRecord(CSVRecord baseRecord) {
             this.baseRecord = baseRecord;
+        }
+
+        /**
+         * Creates a raw record from a CSV record. Checks if the record is empty and if it is throws an
+         * EmptyRecordException.
+         *
+         * @param csvRecord csv record to wrap in raw record.
+         * @return new raw record instance wrapping the csv record.
+         * @throws EmptyRecordException if the CSV record is empty: has a single column with no value.
+         */
+        private static RawRecord wrap(CSVRecord csvRecord) throws EmptyRecordException {
+
+            if (csvRecord.size() == 1 && csvRecord.get(0).trim().isEmpty()) {
+                throw new EmptyRecordException("Found empty record", (int) csvRecord.getRecordNumber());
+            }
+
+            return new RawRecord(csvRecord);
         }
 
         public String get(int index) {
