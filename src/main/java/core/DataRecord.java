@@ -12,15 +12,33 @@ public class DataRecord {
     private Timestamp timestamp;
     private List<Double> dataValues;
 
+    /**
+     * Creates a data record associated with a timestamp an with a sequence of data values.
+     * This constructor should not be called directly. Instead the DataRecordFactory should be used.
+     *
+     * @param timestamp  timestamp to associate with the record.
+     * @param dataValues data values for the record.
+     */
     public DataRecord(Timestamp timestamp, List<Double> dataValues) {
         this.timestamp = timestamp;
         this.dataValues = dataValues;
     }
 
+    /**
+     * Returns the timestamp for this record.
+     *
+     * @return the timestamp for this record.
+     */
     public Timestamp getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * Returns a list containing the data values in this record. The values are returned in the list in the
+     * same order they appear on the file.
+     *
+     * @return list containing the data values in this record.
+     */
     public List<Double> getDataValues() {
         return dataValues;
     }
