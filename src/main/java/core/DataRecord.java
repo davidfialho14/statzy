@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Encapsulates the data contained in a single line of the CSV/Data file.
  * Provides methods to access the values of each data record.
- * Each data row is associated with a timestamp/instant. Date or time columns are not part of the data.
+ * Each data row is associated with a timestamp. Date or time columns are not part of the data.
  */
 public class DataRecord {
 

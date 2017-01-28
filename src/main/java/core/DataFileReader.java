@@ -17,7 +17,7 @@ public class DataFileReader implements Closeable {
     private final Iterator<CSVRecord> recordIterator;
     private final DataRecordFactory dataRecordFactory;
 
-    private Timestamp previousTimestamp = new Timestamp(0, 0, 0, 0, 0, 0);
+    private Timestamp previousTimestamp = Timestamp.MIN;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -121,7 +121,7 @@ public class DataFileReader implements Closeable {
         }
 
         public String get(int index) {
-            return baseRecord.get(index);
+            return baseRecord.get(index).trim();
         }
 
         public int size() {

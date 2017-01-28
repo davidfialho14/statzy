@@ -1,24 +1,28 @@
 package core;
 
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.EnumMap;
+
+import static java.time.temporal.ChronoUnit.*;
 
 /**
  * Encapsulates the implementation used to represent the timestamps of each data record.
  */
 public class Timestamp implements Comparable<Timestamp> {
 
+    public static final Timestamp MIN = new Timestamp(LocalDateTime.MIN);
+
     // Timestamp uses Java's Instant class underneath to represent the timestamp instant
-    final Instant instant;  // should only be accessed by the TimestampFormatter class
+    final LocalDateTime dateTime;  // should only be accessed by the TimestampFormatter class
 
     /**
      * This constructor should only be used by the TimestampFormatter.
      *
-     * @param instant instant to represent the timestamp.
+     * @param dateTime instant to represent the timestamp.
      */
-    Timestamp(Instant instant) {
-        this.instant = instant;
+    Timestamp(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     /**
@@ -33,8 +37,43 @@ public class Timestamp implements Comparable<Timestamp> {
      * @param second second of minute (value between 0-59).
      */
     public Timestamp(int year, int month, int day, int hour, int minute, int second) {
-        Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-        instant = calendar.toInstant();
+        dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
+    }
+
+    private static final EnumMap<ChronoUnit, ChronoUnit> truncateUnits = new EnumMap<>(ChronoUnit.class);
+    static {
+        truncateUnits.put(SECONDS, MINUTES);
+        truncateUnits.put(MINUTES, HOURS);
+        truncateUnits.put(HOURS, DAYS);
+    }
+
+    public Timestamp truncateTo(Period period) {
+
+        ChronoUnit truncateUnit = truncateUnits.get(period.getUnit());
+
+//        if (truncateUnit == null) {
+//            int month = instant.get(period.getField());
+//            int interval = month / period.getDuration();
+//            return new Timestamp(instant
+//                    .truncatedTo(DAYS)
+//                    .with(period.getField(), interval * period.getDuration()));
+//
+//        } else {
+//            Instant lowerBound = instant.truncatedTo(truncateUnit);
+//            Instant upperBound = lowerBound.plus(period.getDuration(), period.getUnit());
+//
+//            while (true) {
+//                if (instant.isBefore(upperBound)) {
+//                    return new Timestamp(lowerBound);
+//                }
+//
+//                lowerBound = upperBound;
+//                upperBound = upperBound.plus(period.getDuration(), period.getUnit());
+//            }
+//        }
+
+        return null;
+
     }
 
     /**
@@ -49,7 +88,7 @@ public class Timestamp implements Comparable<Timestamp> {
 
     @Override
     public int compareTo(Timestamp other) {
-        return this.instant.compareTo(other.instant);
+        return this.dateTime.compareTo(other.dateTime);
     }
 
     @Override
@@ -59,12 +98,12 @@ public class Timestamp implements Comparable<Timestamp> {
 
         Timestamp timestamp = (Timestamp) o;
 
-        return instant != null ? instant.equals(timestamp.instant) : timestamp.instant == null;
+        return dateTime != null ? dateTime.equals(timestamp.dateTime) : timestamp.dateTime == null;
     }
 
     @Override
     public int hashCode() {
-        return instant != null ? instant.hashCode() : 0;
+        return dateTime != null ? dateTime.hashCode() : 0;
     }
 
     /**
@@ -75,7 +114,7 @@ public class Timestamp implements Comparable<Timestamp> {
      */
     @Override
     public String toString() {
-        return instant.toString();
+        return dateTime.toString();
     }
 
 }

@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.text.ParseException;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,14 +70,14 @@ public class DataRecordFactoryTest {
     }
 
     @Test
-    public void getDataRecord_FromRawRecordWithInvalidDate_RaisesParseException() throws Exception {
+    public void getDataRecord_FromRawRecordWithInvalidDate_RaisesDateTimeParseException() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(4)
                 .withDateInColumn(0)
                 .withTimeInColumn(1)
                 .build();
 
-        thrown.expect(ParseException.class);
-        thrown.expectMessage("Unparseable date: \"09082016 11:22:33\"");
+        thrown.expect(DateTimeParseException.class);
+        thrown.expectMessage("Text '09082016 11:22:33' could not be parsed at index 2");
         dataRecordFactory.getDataRecord(fakeRawRecord("09082016", "11:22:33", "176", "183"));
     }
 

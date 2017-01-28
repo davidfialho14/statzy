@@ -1,6 +1,7 @@
 package core;
 
 import java.text.ParseException;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
@@ -42,8 +43,10 @@ public class DataRecordFactory {
      * @return new data record instance initialized with a timestamp and a set of values from the raw record.
      * @throws ParseException if the record is missing the timestamp (missing the date or time), or if at
      * least one of the values is not a double value, or if the number of values is not the expected.
+     * @throws DateTimeParseException if the date or time could not be parsed.
      */
-    public DataRecord getDataRecord(DataFileReader.RawRecord record) throws ParseException {
+    public DataRecord getDataRecord(DataFileReader.RawRecord record)
+            throws DateTimeParseException, ParseException {
 
         if (record.size() != columnCount) {
             throw new ParseException("Expected " + columnCount + " columns but got " + record.size(),
@@ -112,7 +115,7 @@ public class DataRecordFactory {
         private int dateColumn = 0;
         private int timeColumn = 1;
         private Set<Integer> ignoredColumns = new HashSet<>();
-        private String datePattern = "dd/MM/yyyy";
+        private String datePattern = "dd/MM/uuuu";
         private String timePattern = "HH:mm:ss";
         private Delimiter delimiter = Delimiter.DEFAULT;    // delimiter for the date and time patterns
         private boolean timeBeforeDate = false;             // indicates if the time comes before the date
@@ -185,7 +188,7 @@ public class DataRecordFactory {
             }
 
             return new DataRecordFactory(columnCount, dateColumn, timeColumn, ignoredColumns,
-                    TimestampFormatter.withPattern(timestampPattern));
+                    TimestampFormatter.ofPattern(timestampPattern));
         }
 
     }
