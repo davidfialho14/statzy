@@ -42,8 +42,8 @@ public class DataFileReaderTest {
                 "09/08/2016, 11:22:30,   123,   144");
         dataFileReader = new DataFileReader(file, dataRecordFactory);
 
-        Timestamp expectedFirstRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 0);
-        Timestamp expectedSecondRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 30);
+        Timestamp expectedFirstRecordsTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 0);
+        Timestamp expectedSecondRecordsTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 30);
 
         assertThat(dataFileReader.read(),
                 is(new DataRecord(expectedFirstRecordsTimestamp, Arrays.asList(176.0, 186.0))));
@@ -77,8 +77,8 @@ public class DataFileReaderTest {
                 "09/08/2016, 11:22:30,   123,   144");
         dataFileReader = new DataFileReader(file, dataRecordFactory);
 
-        Timestamp expectedFirstRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 0);
-        Timestamp expectedSecondRecordsTimestamp = new Timestamp(2016, 8, 9, 11, 22, 30);
+        Timestamp expectedFirstRecordsTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 0);
+        Timestamp expectedSecondRecordsTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 30);
 
         assertThat(dataFileReader.read(),
                 is(new DataRecord(expectedFirstRecordsTimestamp, Arrays.asList(176.0, 186.0))));

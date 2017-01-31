@@ -50,7 +50,7 @@ public class DataRecordFactoryTest {
                 .withTimeInColumn(1)
                 .build();
 
-        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
         List<Double> expectedValues = Arrays.asList(176.0, 186.0);
 
         assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("09/08/2016", "11:22:33", "176", "186")),
@@ -111,7 +111,7 @@ public class DataRecordFactoryTest {
                 .withDateAndTimeInColumn(0)
                 .build();
 
-        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
         List<Double> expectedValues = Arrays.asList(176.0, 186.0);
 
         assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("09/08/2016 11:22:33", "176", "186")),
@@ -125,7 +125,7 @@ public class DataRecordFactoryTest {
                 .withTimeBeforeDate()
                 .build();
 
-        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
         List<Double> expectedValues = Arrays.asList(176.0, 186.0);
 
         assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("11:22:33 09/08/2016", "176", "186")),
@@ -139,7 +139,7 @@ public class DataRecordFactoryTest {
                 .delimitedBy(Delimiter.TAB)
                 .build();
 
-        Timestamp expectedTimestamp = new Timestamp(2016, 8, 9, 11, 22, 33);
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
         List<Double> expectedValues = Arrays.asList(176.0, 186.0);
 
         assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("09/08/2016\t11:22:33", "176", "186")),

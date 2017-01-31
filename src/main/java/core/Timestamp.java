@@ -24,21 +24,6 @@ public class Timestamp implements Comparable<Timestamp> {
     }
 
     /**
-     * Constructor to create a timestamp manually. This constructor provides and interface to create a
-     * timestamp object using the discriminated values for time unit.
-     *
-     * @param year   calendar year.
-     * @param month  month of the year (value between 1-12).
-     * @param day    day of the month (value between 1-31).
-     * @param hour   hour of day (value between 0-23).
-     * @param minute minute of hour (value between 0-59).
-     * @param second second of minute (value between 0-59).
-     */
-    public Timestamp(int year, int month, int day, int hour, int minute, int second) {
-        dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
-    }
-
-    /**
      * Obtains an instance of Timestamp from year, month, day, hour, minute and second. The day must be
      * valid for the year and month, otherwise an exception will be thrown.
      *
