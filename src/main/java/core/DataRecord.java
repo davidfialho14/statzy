@@ -1,5 +1,6 @@
 package core;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public class DataRecord {
     private List<Double> dataValues;
 
     /**
-     * Creates a data record associated with a timestamp an with a sequence of data values.
+     * Creates a data record associated with a timestamp and with a sequence of data values.
      * This constructor should not be called directly. Instead the DataRecordFactory should be used.
      *
      * @param timestamp  timestamp to associate with the record.
@@ -22,6 +23,18 @@ public class DataRecord {
     public DataRecord(Timestamp timestamp, List<Double> dataValues) {
         this.timestamp = timestamp;
         this.dataValues = dataValues;
+    }
+
+    /**
+     * Creates a data record associated with a timestamp and with a sequence of data values. This factory
+     * method is just a wrapper around the constructor to statically create records in a more readable way.
+     * It simply converts the dataValues from array to list.
+     *
+     * @param timestamp  timestamp to associate with the record.
+     * @param dataValues data values for the record.
+     */
+    public static DataRecord dataRecord(Timestamp timestamp, Double... dataValues) {
+        return new DataRecord(timestamp, Arrays.asList(dataValues));
     }
 
     /**
