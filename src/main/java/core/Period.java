@@ -19,14 +19,31 @@ public class Period {
         this.unit = unit;
     }
 
+    /**
+     * Obtains an instance of Period with the specified length given in the specified units.
+     *
+     * @param length the length of the period.
+     * @param unit   the unit for the specified length.
+     * @return the period, not null.
+     */
     public static Period of(int length, Unit unit) {
         return new Period(length, unit);
     }
 
+    /**
+     * Returns the length of the period.
+     *
+     * @return the length of the period.
+     */
     public int getLength() {
         return length;
     }
 
+    /**
+     * Returns the time unit the period length is specified on.
+     *
+     * @return the time unit the period length is specified on.
+     */
     public Unit getUnit() {
         return unit;
     }

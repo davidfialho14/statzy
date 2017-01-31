@@ -1,5 +1,6 @@
 package core;
 
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -37,6 +38,20 @@ public class Timestamp implements Comparable<Timestamp> {
         dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
     }
 
+    /**
+     * Obtains an instance of Timestamp from year, month, day, hour, minute and second. The day must be
+     * valid for the year and month, otherwise an exception will be thrown.
+     *
+     * @param year   calendar year.
+     * @param month  month of the year (value between 1-12).
+     * @param day    day of the month (value between 1-31).
+     * @param hour   hour of day (value between 0-23).
+     * @param minute minute of hour (value between 0-59).
+     * @param second second of minute (value between 0-59).
+     * @return the timestamp, not null.
+     * @throws DateTimeException if the value of any field is out of range, or if the day-of-month is
+     * invalid for the month-year.
+     */
     public static Timestamp of(int year, int month, int day, int hour, int minute, int second) {
         return new Timestamp(LocalDateTime.of(year, month, day, hour, minute, second));
     }
@@ -113,6 +128,12 @@ public class Timestamp implements Comparable<Timestamp> {
         return unit.truncate(this);
     }
 
+    /**
+     * This returns a Timestamp, based on this one, with the given period length added.
+     *
+     * @param period the period to add to the timestamp, not null.
+     * @return a copy of this timestamp with the specified period added.
+     */
     public Timestamp plus(Period period) {
         return new Timestamp(dateTime.plus(period.getLength(), period.getUnit().getBaseUnit()));
     }
@@ -181,6 +202,5 @@ public class Timestamp implements Comparable<Timestamp> {
     Timestamp truncatedTo(ChronoUnit unit) {
         return new Timestamp(dateTime.truncatedTo(unit));
     }
-
 
 }

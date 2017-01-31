@@ -1,6 +1,5 @@
 package core;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static core.Unit.*;
@@ -89,6 +88,46 @@ public class TimestampTest {
 
         assertThat(timestamp.plus(period),
                 is(Timestamp.of(2016, 2, 29, 10, 10, 10)));
+    }
+
+    @Test
+    public void plus_3DaysOnDate20161010AndTime101010_Date20161013AndTime101010() throws Exception {
+
+        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 10);
+        Period period = Period.of(3, DAYS);
+
+        assertThat(timestamp.plus(period),
+                is(Timestamp.of(2016, 10, 13, 10, 10, 10)));
+    }
+
+    @Test
+    public void plus_3HoursOnDate20161010AndTime101010_Date20161010AndTime131010() throws Exception {
+
+        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 10);
+        Period period = Period.of(3, HOURS);
+
+        assertThat(timestamp.plus(period),
+                is(Timestamp.of(2016, 10, 10, 13, 10, 10)));
+    }
+
+    @Test
+    public void plus_3MinutesOnDate20161010AndTime101010_Date20161010AndTime101310() throws Exception {
+
+        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 10);
+        Period period = Period.of(3, MINUTES);
+
+        assertThat(timestamp.plus(period),
+                is(Timestamp.of(2016, 10, 10, 10, 13, 10)));
+    }
+
+    @Test
+    public void plus_3SecondsOnDate20161010AndTime101010_Date20161010AndTime101013() throws Exception {
+
+        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 10);
+        Period period = Period.of(3, SECONDS);
+
+        assertThat(timestamp.plus(period),
+                is(Timestamp.of(2016, 10, 10, 10, 10, 13)));
     }
 
 }
