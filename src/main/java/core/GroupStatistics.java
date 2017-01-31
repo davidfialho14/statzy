@@ -82,4 +82,11 @@ public class GroupStatistics {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Clears all statistics for all data sets.
+     */
+    public void clear() {
+        itemsStatistics.forEach(SummaryStatistics::clear);
+    }
+
 }
