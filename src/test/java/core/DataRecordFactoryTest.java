@@ -154,4 +154,13 @@ public class DataRecordFactoryTest {
                 .build();
     }
 
+    @Test
+    public void constructor_SetFactoryWithColumnCount4AndIgnoredColumn10_RaisesIllegalArgumentException()
+            throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        factoryExpectingItemCountPerRecord(4)
+                .ignoreColumns(4)
+                .build();
+    }
+
 }

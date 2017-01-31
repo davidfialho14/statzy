@@ -25,6 +25,16 @@ public class DataRecordFactory {
     private DataRecordFactory(int columnCount, int dateColumn, int timeColumn,
                              Collection<Integer> ignoredColumns, TimestampFormatter formatter) {
 
+        for (Integer ignoredColumn : ignoredColumns) {
+
+            if (ignoredColumn >= columnCount) {
+                throw new IllegalArgumentException("Ignored columns set includes an invalid column: " +
+                        "expected to have only " + columnCount + " and ignored columns set includes column " +
+                        "" + ignoredColumn);
+            }
+        }
+
+
         this.columnCount = columnCount;
         this.dateColumn = dateColumn;
         this.timeColumn = timeColumn;
@@ -78,6 +88,15 @@ public class DataRecordFactory {
         }
 
         return new DataRecord(timestamp, values);
+    }
+
+    /**
+     * Returns the expected number of data values.
+     *
+     * @return the expected number of data values.
+     */
+    public int getExpectedValueCount() {
+        return columnCount - ignoredColumns.size();
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
