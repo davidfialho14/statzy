@@ -52,47 +52,43 @@ public class TimestampTest {
     }
 
     @Test
-    @Ignore
-    public void plus_0YearsOnDate20161010AndTime101010_Date20170101AndTime000000() throws Exception {
+    public void plus_1YearOnDate20161010AndTime101010_Date20171010AndTime101010() throws Exception {
 
-        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 0);
-        Period period = Period.of(0, YEARS);
+        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 10);
+        Period period = Period.of(1, YEARS);
 
         assertThat(timestamp.plus(period),
-                is(Timestamp.of(2016, 1, 1, 0, 0, 0)));
+                is(Timestamp.of(2017, 10, 10, 10, 10, 10)));
     }
 
     @Test
-    @Ignore
-    public void plus_0MonthsOnDate20161010AndTime101010_Date20170201AndTime000000() throws Exception {
+    public void plus_1MonthOnDate20161010AndTime101010_Date20161110AndTime101010() throws Exception {
 
-        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 0);
-        Period period = Period.of(0, MONTHS);
-
-        assertThat(timestamp.plus(period),
-                is(Timestamp.of(2016, 10, 1, 0, 0, 0)));
-    }
-
-    @Test
-    @Ignore
-    public void plus_1MonthOnDate20161010AndTime101010_Date20161101AndTime000000() throws Exception {
-
-        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 0);
+        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 10);
         Period period = Period.of(1, MONTHS);
 
         assertThat(timestamp.plus(period),
-                is(Timestamp.of(2016, 11, 1, 0, 0, 0)));
+                is(Timestamp.of(2016, 11, 10, 10, 10, 10)));
     }
 
     @Test
-    @Ignore
-    public void plus_3MonthsOnDate20161010AndTime101010_Date20170201AndTime000000() throws Exception {
+    public void plus_3MonthsOnDate20161010AndTime101010_Date20170201AndTime101010() throws Exception {
 
-        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 0);
+        Timestamp timestamp = Timestamp.of(2016, 10, 10, 10, 10, 10);
         Period period = Period.of(3, MONTHS);
 
         assertThat(timestamp.plus(period),
-                is(Timestamp.of(2017, 1, 1, 0, 0, 0)));
+                is(Timestamp.of(2017, 1, 10, 10, 10, 10)));
+    }
+
+    @Test
+    public void plus_1MonthOnDate20160130AndTime101010_Date20160229AndTime101010() throws Exception {
+
+        Timestamp timestamp = Timestamp.of(2016, 1, 30, 10, 10, 10);
+        Period period = Period.of(1, MONTHS);
+
+        assertThat(timestamp.plus(period),
+                is(Timestamp.of(2016, 2, 29, 10, 10, 10)));
     }
 
 }

@@ -1,12 +1,14 @@
 package core;
 
+import java.time.temporal.ChronoUnit;
+
 /**
  * Representation of a date/time unit. Replaces the ChronoUnit class, providing methods to truncate a
  * timestamp to years and months.
  */
 public enum Unit {
 
-    YEARS {
+    YEARS(ChronoUnit.YEARS) {
 
         @Override
         Timestamp truncate(Timestamp timestamp) {
@@ -15,7 +17,7 @@ public enum Unit {
 
     },
 
-    MONTHS {
+    MONTHS(ChronoUnit.MONTHS) {
 
         @Override
         Timestamp truncate(Timestamp timestamp) {
@@ -24,7 +26,7 @@ public enum Unit {
 
     },
 
-    DAYS {
+    DAYS(ChronoUnit.DAYS) {
 
         @Override
         Timestamp truncate(Timestamp timestamp) {
@@ -33,16 +35,15 @@ public enum Unit {
 
     },
 
-    HOURS {
+    HOURS(ChronoUnit.HOURS) {
 
         @Override
         Timestamp truncate(Timestamp timestamp) {
             return timestamp.truncatedToHours();
         }
-
     },
 
-    MINUTES {
+    MINUTES(ChronoUnit.MINUTES) {
 
         @Override
         Timestamp truncate(Timestamp timestamp) {
@@ -51,7 +52,7 @@ public enum Unit {
 
     },
 
-    SECONDS {
+    SECONDS(ChronoUnit.SECONDS) {
 
         @Override
         Timestamp truncate(Timestamp timestamp) {
@@ -59,6 +60,16 @@ public enum Unit {
         }
 
     };
+
+    private final ChronoUnit baseUnit;
+
+    Unit(ChronoUnit baseUnit) {
+        this.baseUnit = baseUnit;
+    }
+
+    ChronoUnit getBaseUnit() {
+        return baseUnit;
+    }
 
     abstract Timestamp truncate(Timestamp timestamp);
 }

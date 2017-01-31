@@ -114,7 +114,7 @@ public class Timestamp implements Comparable<Timestamp> {
     }
 
     public Timestamp plus(Period period) {
-        return period.addTo(this);
+        return new Timestamp(dateTime.plus(period.getLength(), period.getUnit().getBaseUnit()));
     }
 
     /**
