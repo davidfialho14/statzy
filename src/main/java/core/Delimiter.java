@@ -1,11 +1,9 @@
 package core;
 
 /**
- * Created by david on 24-12-2016.
- *
- * Enumerator with for all possible split characters that can be used to split dates and times.
+ * Collection of delimiters that can be used to separate date and times in the same column.
  */
-public enum SplitCharacter {
+public enum Delimiter {
 
     NONE("None", ""),
     COMMA("Comma", ","),
@@ -13,12 +11,18 @@ public enum SplitCharacter {
     SEMI_COLON("Semicolon", ";"),
     TAB("Tab", "\t");
 
+    public static Delimiter DEFAULT = SPACE;
+
     private final String name;
     private final String character;
 
-    SplitCharacter(String name, String character) {
+    Delimiter(String name, String character) {
         this.name = name;
         this.character = character;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getCharacter() {
@@ -27,6 +31,6 @@ public enum SplitCharacter {
 
     @Override
     public String toString() {
-        return name;
+        return character;
     }
 }
