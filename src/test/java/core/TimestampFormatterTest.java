@@ -55,7 +55,7 @@ public class TimestampFormatterTest {
     public void format_ValidFormattedString_CorrespondingTimestamp() throws Exception {
 
         assertThat(formatter.format(new Timestamp(2016, 1, 9, 5, 3, 2)),
-                is("09/01/2016 05:03:02"));
+                is("09/01/2016 05:03:03"));
     }
 
 }

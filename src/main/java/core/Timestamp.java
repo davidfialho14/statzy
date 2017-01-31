@@ -2,9 +2,6 @@ package core;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.EnumMap;
-
-import static java.time.temporal.ChronoUnit.*;
 
 /**
  * Encapsulates the implementation used to represent the timestamps of each data record.
@@ -40,40 +37,84 @@ public class Timestamp implements Comparable<Timestamp> {
         dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
     }
 
-    private static final EnumMap<ChronoUnit, ChronoUnit> truncateUnits = new EnumMap<>(ChronoUnit.class);
-    static {
-        truncateUnits.put(SECONDS, MINUTES);
-        truncateUnits.put(MINUTES, HOURS);
-        truncateUnits.put(HOURS, DAYS);
+    public static Timestamp of(int year, int month, int day, int hour, int minute, int second) {
+        return new Timestamp(LocalDateTime.of(year, month, day, hour, minute, second));
     }
 
-    public Timestamp truncateTo(Period period) {
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     *  Public Interface
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-        ChronoUnit truncateUnit = truncateUnits.get(period.getUnit());
+    /**
+     * This method returns the primitive int value for the year.
+     *
+     * @return the year, from MIN_YEAR to MAX_YEAR.
+     */
+    public int getYear() {
+        return dateTime.getYear();
+    }
 
-//        if (truncateUnit == null) {
-//            int month = instant.get(period.getField());
-//            int interval = month / period.getDuration();
-//            return new Timestamp(instant
-//                    .truncatedTo(DAYS)
-//                    .with(period.getField(), interval * period.getDuration()));
-//
-//        } else {
-//            Instant lowerBound = instant.truncatedTo(truncateUnit);
-//            Instant upperBound = lowerBound.plus(period.getDuration(), period.getUnit());
-//
-//            while (true) {
-//                if (instant.isBefore(upperBound)) {
-//                    return new Timestamp(lowerBound);
-//                }
-//
-//                lowerBound = upperBound;
-//                upperBound = upperBound.plus(period.getDuration(), period.getUnit());
-//            }
-//        }
+    /**
+     * This method returns the month as an int from 1 to 12
+     *
+     * @return the month, from 1 to 12.
+     */
+    public int getMonth() {
+        return dateTime.getMonthValue();
+    }
 
-        return null;
+    /**
+     * This method returns the primitive int value for the day-of-month.
+     *
+     * @return the day-of-month, from 1 to 31.
+     */
+    public int getDay() {
+        return dateTime.getDayOfMonth();
+    }
 
+    /**
+     * Gets the hour-of-day field.
+     *
+     * @return the hour-of-day, from 0 to 23
+     */
+    public int getHour() {
+        return dateTime.getHour();
+    }
+
+    /**
+     * Gets the minute-of-hour field.
+     *
+     * @return the minute-of-hour, from 0 to 59
+     */
+    public int getMinute() {
+        return dateTime.getMinute();
+    }
+
+    /**
+     * Gets the second-of-minute field.
+     *
+     * @return the second-of-minute, from 0 to 59
+     */
+    public int getSecond() {
+        return dateTime.getSecond();
+    }
+
+    /**
+     * Returns a copy of this Timestamp with the date and time truncated. Truncation returns a copy of the
+     * original date-time with fields smaller than the specified unit set to zero. Day and month fields are
+     * truncated to 1.
+     *
+     * @param unit the unit to truncate to, not null.
+     * @return copy of this timestamp with the date and time truncated, not null.
+     */
+    public Timestamp truncatedTo(Unit unit) {
+        return unit.truncate(this);
+    }
+
+    public Timestamp plus(Period period) {
+        return period.addTo(this);
     }
 
     /**
@@ -115,6 +156,36 @@ public class Timestamp implements Comparable<Timestamp> {
     @Override
     public String toString() {
         return dateTime.toString();
+    }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     *  Truncation visitor methods, visited by the Unit objects to truncate a timestamp.
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    Timestamp truncatedToYears() {
+        return Timestamp.of(dateTime.getYear(), 1, 1, 0, 0, 0);
+    }
+
+    Timestamp truncatedToMonths() {
+        return Timestamp.of(dateTime.getYear(), dateTime.getMonthValue(), 1, 0, 0, 0);
+    }
+
+    Timestamp truncatedToDays() {
+        return new Timestamp(dateTime.truncatedTo(ChronoUnit.DAYS));
+    }
+
+    Timestamp truncatedToHours() {
+        return new Timestamp(dateTime.truncatedTo(ChronoUnit.HOURS));
+    }
+
+    Timestamp truncatedToMinutes() {
+        return new Timestamp(dateTime.truncatedTo(ChronoUnit.MINUTES));
+    }
+
+    Timestamp truncatedToSeconds() {
+        return new Timestamp(dateTime.truncatedTo(ChronoUnit.SECONDS));
     }
 
 }
