@@ -26,40 +26,10 @@ public enum Unit {
 
     },
 
-    DAYS(ChronoUnit.DAYS) {
-
-        @Override
-        Timestamp truncate(Timestamp timestamp) {
-            return timestamp.truncatedToDays();
-        }
-
-    },
-
-    HOURS(ChronoUnit.HOURS) {
-
-        @Override
-        Timestamp truncate(Timestamp timestamp) {
-            return timestamp.truncatedToHours();
-        }
-    },
-
-    MINUTES(ChronoUnit.MINUTES) {
-
-        @Override
-        Timestamp truncate(Timestamp timestamp) {
-            return timestamp.truncatedToMinutes();
-        }
-
-    },
-
-    SECONDS(ChronoUnit.SECONDS) {
-
-        @Override
-        Timestamp truncate(Timestamp timestamp) {
-            return timestamp.truncatedToSeconds();
-        }
-
-    };
+    DAYS(ChronoUnit.DAYS),
+    HOURS(ChronoUnit.HOURS),
+    MINUTES(ChronoUnit.MINUTES),
+    SECONDS(ChronoUnit.SECONDS);
 
     private final ChronoUnit baseUnit;
 
@@ -71,5 +41,7 @@ public enum Unit {
         return baseUnit;
     }
 
-    abstract Timestamp truncate(Timestamp timestamp);
+    Timestamp truncate(Timestamp timestamp) {
+        return timestamp.truncatedTo(getBaseUnit());
+    }
 }

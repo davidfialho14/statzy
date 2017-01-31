@@ -172,20 +172,15 @@ public class Timestamp implements Comparable<Timestamp> {
         return Timestamp.of(dateTime.getYear(), dateTime.getMonthValue(), 1, 0, 0, 0);
     }
 
-    Timestamp truncatedToDays() {
-        return new Timestamp(dateTime.truncatedTo(ChronoUnit.DAYS));
+    /**
+     * Can only be called for the Seconds, Minutes, Hours, and Days units.
+     *
+     * @param unit the unit to truncate timestamp to, not null.
+     * @return copy of the timestamp truncated to the given chrono unit, not null.
+     */
+    Timestamp truncatedTo(ChronoUnit unit) {
+        return new Timestamp(dateTime.truncatedTo(unit));
     }
 
-    Timestamp truncatedToHours() {
-        return new Timestamp(dateTime.truncatedTo(ChronoUnit.HOURS));
-    }
-
-    Timestamp truncatedToMinutes() {
-        return new Timestamp(dateTime.truncatedTo(ChronoUnit.MINUTES));
-    }
-
-    Timestamp truncatedToSeconds() {
-        return new Timestamp(dateTime.truncatedTo(ChronoUnit.SECONDS));
-    }
 
 }
