@@ -1,5 +1,6 @@
 package core;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 /**
@@ -20,7 +21,7 @@ public class StatisticsGenerator {
      * @throws ParseException if the input data file is not valid or some line in the file is corrupted.
      */
     public void process(DataFileReader dataReader, DataFileWriter dataWriter, Period period)
-            throws ParseException {
+            throws ParseException, IOException {
 
         DataRecord record = dataReader.read();  // read first record
         if (record == null) return;
