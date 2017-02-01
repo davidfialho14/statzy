@@ -4,6 +4,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,11 +15,14 @@ import java.util.List;
 public class DataFileWriter implements Closeable {
 
     private static final char DELIMITER = ',';
+    private static final List<String> STATS_HEADERS = Arrays.asList("Avg", "StdDev");
+
     private final CSVPrinter printer;
     private final TimestampFormatter dateFormatter;
     private final TimestampFormatter timeFormatter;
     private final Delimiter delimiter;  // might be null: indicates the date and time are in different columns
     private final boolean timeBeforeDate;
+    private final int dataSetCount;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -26,7 +31,8 @@ public class DataFileWriter implements Closeable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     public DataFileWriter(Writer writer, TimestampFormatter dateFormatter, TimestampFormatter timeFormatter,
-                          Delimiter delimiter, boolean timeBeforeDate) throws IOException {
+                          Delimiter delimiter, boolean timeBeforeDate, List<String> dataSetHeaders)
+            throws IOException {
 
         printer = CSVFormat.EXCEL
                 .withDelimiter(DELIMITER)
@@ -36,6 +42,34 @@ public class DataFileWriter implements Closeable {
         this.timeFormatter = timeFormatter;
         this.delimiter = delimiter;
         this.timeBeforeDate = timeBeforeDate;
+        this.dataSetCount = dataSetHeaders.size();
+
+        // write the headers to the first line
+        printHeaders(dataSetHeaders);
+    }
+
+    private void printHeaders(List<String> dataSetHeaders) throws IOException {
+
+        // print headers for the date and time
+        if (timeBeforeDate) {
+            printer.print("Time");
+            printer.print("Date");
+        } else {
+            printer.print("Date");
+            printer.print("Time");
+        }
+
+        // print header for the counts
+        printer.print("Count");
+
+        // print statistic header for each data header
+        for (String header : dataSetHeaders) {
+            for (String statsHeader : STATS_HEADERS) {
+                printer.print(header + " - " + statsHeader);
+            }
+        }
+
+        printer.println();
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -125,6 +159,7 @@ public class DataFileWriter implements Closeable {
         private boolean sameColumn = false;
         private Delimiter delimiter = Delimiter.DEFAULT;
         private boolean timeBeforeDate = false;
+        private List<String> headers = Collections.emptyList();
 
         private Builder(Writer writer) {
             this.writer = writer;
@@ -155,13 +190,18 @@ public class DataFileWriter implements Closeable {
             return this;
         }
 
+        public Builder withHeaders(List<String> headers) {
+            this.headers = headers;
+            return this;
+        }
+
         public DataFileWriter build() throws IOException {
 
             return new DataFileWriter(writer,
                     TimestampFormatter.ofPattern(datePattern),
                     TimestampFormatter.ofPattern(timePattern),
                     sameColumn ? delimiter : null,
-                    timeBeforeDate);
+                    timeBeforeDate, headers);
         }
 
     }
