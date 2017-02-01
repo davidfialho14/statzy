@@ -79,22 +79,26 @@ public class DataFileWriter implements Closeable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * Writes a record into the output file.
+     * Writes a record into the output file. The mean and std deviation values should be provided in the
+     * same order as the headers that were specified when building the data file writer. If the number of
+     * values in the means/std deviations lists do not correspond to the number of headers, an
+     * IllegalArgumentException is thrown.
      *
      * @param timestamp the timestamp for the record.
      * @param count     the number of records in the data.
      * @param means     the means for each data set.
      * @param standardDeviations the standard deviations for each data set.
      * @throws IOException if an IO error occurs.
-     * @throws IllegalArgumentException if the number of values in the means list is different from the std
-     * deviations list.
+     * @throws IllegalArgumentException if the number of values in the means//std deviations list is
+     * different from the number headers.
      */
     public void write(Timestamp timestamp, long count, List<Double> means, List<Double> standardDeviations)
             throws IOException {
 
-        if (means.size() != standardDeviations.size()) {
+        if (dataSetCount != means.size() || dataSetCount != standardDeviations.size()) {
             throw new IllegalArgumentException("The lists with the mean values and the standard deviations " +
-                    "do not have the same number of values");
+                    "are expected to have " + dataSetCount + " values, but have " + means.size() + " and "
+                    + standardDeviations.size() + " values, respectively.");
         }
 
         String date = dateFormatter.format(timestamp);

@@ -1,6 +1,8 @@
 package core;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -23,6 +25,9 @@ public class DataFileWriterTest {
     private static List<Double> stdevs(Double... stdevs) {
         return Arrays.asList(stdevs);
     }
+
+    @Rule
+    public ExpectedException catcher = ExpectedException.none();
 
     @Test
     public void
@@ -132,6 +137,34 @@ public class DataFileWriterTest {
         assertThat(output.toString(),
                 is("Time,Date,Count,H1 - Avg,H1 - StdDev" + END_LINE +
                    "01:02:03,2016/11/22,3,1.0,2.0" + END_LINE));
+    }
+
+    @Test
+    public void
+    write_SuppliedOnly1HeaderButMeansListHas2Values_ThrowsIllegalArgumentException() throws Exception {
+
+        try (
+                DataFileWriter writer = DataFileWriter.outputTo(new StringWriter())
+                        .withHeaders(Collections.singletonList("H1"))
+                        .build()
+        ) {
+            catcher.expect(IllegalArgumentException.class);
+            writer.write(Timestamp.of(2016, 11, 22, 1, 2, 3), 3, means(1.0, 2.0), stdevs(2.0));
+        }
+    }
+
+    @Test
+    public void
+    write_SuppliedOnly1HeaderButStdDeviationsListHas2Values_ThrowsIllegalArgumentException() throws Exception {
+
+        try (
+                DataFileWriter writer = DataFileWriter.outputTo(new StringWriter())
+                        .withHeaders(Collections.singletonList("H1"))
+                        .build()
+        ) {
+            catcher.expect(IllegalArgumentException.class);
+            writer.write(Timestamp.of(2016, 11, 22, 1, 2, 3), 3, means(1.0), stdevs(2.0, 3.0));
+        }
     }
 
 }
