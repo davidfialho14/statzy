@@ -25,6 +25,16 @@ public class DataRecordFactory {
     private DataRecordFactory(int columnCount, int dateColumn, int timeColumn,
                              Collection<Integer> ignoredColumns, TimestampFormatter formatter) {
 
+        for (Integer ignoredColumn : ignoredColumns) {
+
+            if (ignoredColumn >= columnCount) {
+                throw new IllegalArgumentException("Ignored columns set includes an invalid column: " +
+                        "expected to have only " + columnCount + " and ignored columns set includes column " +
+                        "" + ignoredColumn);
+            }
+        }
+
+
         this.columnCount = columnCount;
         this.dateColumn = dateColumn;
         this.timeColumn = timeColumn;
@@ -78,6 +88,15 @@ public class DataRecordFactory {
         }
 
         return new DataRecord(timestamp, values);
+    }
+
+    /**
+     * Returns the expected number of data values.
+     *
+     * @return the expected number of data values.
+     */
+    public int getExpectedValueCount() {
+        return columnCount - ignoredColumns.size();
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -168,8 +187,8 @@ public class DataRecordFactory {
             return this;
         }
 
-        public Builder withTimeBeforeDate() {
-            timeBeforeDate = true;
+        public Builder withTimeBeforeDate(boolean timeBeforeDate) {
+            this.timeBeforeDate = timeBeforeDate;
             return this;
         }
 
@@ -181,10 +200,15 @@ public class DataRecordFactory {
         public DataRecordFactory build() {
 
             String timestampPattern;
-            if (timeBeforeDate) {
-                timestampPattern = timePattern + delimiter + datePattern;
+            if (dateColumn == timeColumn) {
+                if (timeBeforeDate) {
+                    timestampPattern = timePattern + delimiter + datePattern;
+                } else {
+                    timestampPattern = datePattern + delimiter + timePattern;
+                }
+
             } else {
-                timestampPattern = datePattern + delimiter + timePattern;
+                timestampPattern = datePattern + Delimiter.DEFAULT + timePattern;
             }
 
             return new DataRecordFactory(columnCount, dateColumn, timeColumn, ignoredColumns,

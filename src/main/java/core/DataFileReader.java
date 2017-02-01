@@ -45,6 +45,15 @@ public class DataFileReader implements Closeable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
+     * Returns the expected number of data values in each data record.
+     *
+     * @return the expected number of data values in each data record.
+     */
+    public int getExpectedValueCount() {
+        return dataRecordFactory.getExpectedValueCount();
+    }
+
+    /**
      * Reads the next data record in the file. Each line in the file is recognized as as data record.
      * Therefore, calling this method is the same as reading the next line in a file that is not empty.
      * Ignores all empty lines in the file. If the file does not have anymore non-empty lines, then it
