@@ -193,7 +193,14 @@ public class DataRecordFactory {
         }
 
         public Builder ignoreColumns(Integer... columns) {
+            ignoredColumns.clear();
             Collections.addAll(ignoredColumns, columns);
+            return this;
+        }
+
+        public Builder ignoreColumns(Collection<Integer> columns) {
+            ignoredColumns.clear();
+            this.ignoredColumns.addAll(columns);
             return this;
         }
 

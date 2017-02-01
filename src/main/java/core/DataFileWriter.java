@@ -4,6 +4,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,11 +15,14 @@ import java.util.List;
 public class DataFileWriter implements Closeable {
 
     private static final char DELIMITER = ',';
+    private static final List<String> STATS_HEADERS = Arrays.asList("Avg", "StdDev");
+
     private final CSVPrinter printer;
     private final TimestampFormatter dateFormatter;
     private final TimestampFormatter timeFormatter;
     private final Delimiter delimiter;  // might be null: indicates the date and time are in different columns
     private final boolean timeBeforeDate;
+    private final int dataSetCount;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -26,7 +31,8 @@ public class DataFileWriter implements Closeable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     public DataFileWriter(Writer writer, TimestampFormatter dateFormatter, TimestampFormatter timeFormatter,
-                          Delimiter delimiter, boolean timeBeforeDate) throws IOException {
+                          Delimiter delimiter, boolean timeBeforeDate, Headers headers)
+            throws IOException {
 
         printer = CSVFormat.EXCEL
                 .withDelimiter(DELIMITER)
@@ -36,6 +42,34 @@ public class DataFileWriter implements Closeable {
         this.timeFormatter = timeFormatter;
         this.delimiter = delimiter;
         this.timeBeforeDate = timeBeforeDate;
+        this.dataSetCount = headers.getDataHeaders().size();
+
+        // write the headers to the first line
+        printHeaders(headers);
+    }
+
+    private void printHeaders(Headers headers) throws IOException {
+
+        // print headers for the date and time
+        if (timeBeforeDate) {
+            printer.print(headers.getTimeHeader());
+            printer.print(headers.getDateHeader());
+        } else {
+            printer.print(headers.getDateHeader());
+            printer.print(headers.getTimeHeader());
+        }
+
+        // print header for the counts
+        printer.print("Count");
+
+        // print statistic header for each data header
+        for (String header : headers.getDataHeaders()) {
+            for (String statsHeader : STATS_HEADERS) {
+                printer.print(header + " - " + statsHeader);
+            }
+        }
+
+        printer.println();
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -45,22 +79,26 @@ public class DataFileWriter implements Closeable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * Writes a record into the output file.
+     * Writes a record into the output file. The mean and std deviation values should be provided in the
+     * same order as the headers that were specified when building the data file writer. If the number of
+     * values in the means/std deviations lists do not correspond to the number of headers, an
+     * IllegalArgumentException is thrown.
      *
      * @param timestamp the timestamp for the record.
      * @param count     the number of records in the data.
      * @param means     the means for each data set.
      * @param standardDeviations the standard deviations for each data set.
      * @throws IOException if an IO error occurs.
-     * @throws IllegalArgumentException if the number of values in the means list is different from the std
-     * deviations list.
+     * @throws IllegalArgumentException if the number of values in the means//std deviations list is
+     * different from the number headers.
      */
     public void write(Timestamp timestamp, long count, List<Double> means, List<Double> standardDeviations)
             throws IOException {
 
-        if (means.size() != standardDeviations.size()) {
+        if (dataSetCount != means.size() || dataSetCount != standardDeviations.size()) {
             throw new IllegalArgumentException("The lists with the mean values and the standard deviations " +
-                    "do not have the same number of values");
+                    "are expected to have " + dataSetCount + " values, but have " + means.size() + " and "
+                    + standardDeviations.size() + " values, respectively.");
         }
 
         String date = dateFormatter.format(timestamp);
@@ -125,6 +163,8 @@ public class DataFileWriter implements Closeable {
         private boolean sameColumn = false;
         private Delimiter delimiter = Delimiter.DEFAULT;
         private boolean timeBeforeDate = false;
+        private Headers headers = null; // if null the builder will be used
+        private Headers.Builder headersBuilder = new Headers.Builder();
 
         private Builder(Writer writer) {
             this.writer = writer;
@@ -155,13 +195,42 @@ public class DataFileWriter implements Closeable {
             return this;
         }
 
+        public Builder withDataHeaders(List<String> headers) {
+            headersBuilder.dataHeaders(headers);
+            return this;
+        }
+
+        public Builder withDataHeaders(String... headers) {
+            headersBuilder.dataHeaders(headers);
+            return this;
+        }
+
+        public Builder withDateHeader(String header) {
+            headersBuilder.dateHeader(header);
+            return this;
+        }
+
+        public Builder withTimeHeader(String header) {
+            headersBuilder.dateHeader(header);
+            return this;
+        }
+
+        public Builder withHeaders(Headers headers) {
+            this.headers = headers;
+            return this;
+        }
+
         public DataFileWriter build() throws IOException {
+
+            if (headers == null) {
+                headers = headersBuilder.build();
+            }
 
             return new DataFileWriter(writer,
                     TimestampFormatter.ofPattern(datePattern),
                     TimestampFormatter.ofPattern(timePattern),
                     sameColumn ? delimiter : null,
-                    timeBeforeDate);
+                    timeBeforeDate, headers);
         }
 
     }
