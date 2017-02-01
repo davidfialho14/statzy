@@ -163,6 +163,7 @@ public class DataFileWriter implements Closeable {
         private boolean sameColumn = false;
         private Delimiter delimiter = Delimiter.DEFAULT;
         private boolean timeBeforeDate = false;
+        private Headers headers = null; // if null the builder will be used
         private Headers.Builder headersBuilder = new Headers.Builder();
 
         private Builder(Writer writer) {
@@ -214,13 +215,22 @@ public class DataFileWriter implements Closeable {
             return this;
         }
 
+        public Builder withHeaders(Headers headers) {
+            this.headers = headers;
+            return this;
+        }
+
         public DataFileWriter build() throws IOException {
+
+            if (headers == null) {
+                headers = headersBuilder.build();
+            }
 
             return new DataFileWriter(writer,
                     TimestampFormatter.ofPattern(datePattern),
                     TimestampFormatter.ofPattern(timePattern),
                     sameColumn ? delimiter : null,
-                    timeBeforeDate, headersBuilder.build());
+                    timeBeforeDate, headers);
         }
 
     }
