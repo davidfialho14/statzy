@@ -31,7 +31,7 @@ public class DataFileWriter implements Closeable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     public DataFileWriter(Writer writer, TimestampFormatter dateFormatter, TimestampFormatter timeFormatter,
-                          Delimiter delimiter, boolean timeBeforeDate, List<String> dataSetHeaders)
+                          Delimiter delimiter, boolean timeBeforeDate, Headers headers)
             throws IOException {
 
         printer = CSVFormat.EXCEL
@@ -42,28 +42,28 @@ public class DataFileWriter implements Closeable {
         this.timeFormatter = timeFormatter;
         this.delimiter = delimiter;
         this.timeBeforeDate = timeBeforeDate;
-        this.dataSetCount = dataSetHeaders.size();
+        this.dataSetCount = headers.getDataHeaders().size();
 
         // write the headers to the first line
-        printHeaders(dataSetHeaders);
+        printHeaders(headers);
     }
 
-    private void printHeaders(List<String> dataSetHeaders) throws IOException {
+    private void printHeaders(Headers headers) throws IOException {
 
         // print headers for the date and time
         if (timeBeforeDate) {
-            printer.print("Time");
-            printer.print("Date");
+            printer.print(headers.getTimeHeader());
+            printer.print(headers.getDateHeader());
         } else {
-            printer.print("Date");
-            printer.print("Time");
+            printer.print(headers.getDateHeader());
+            printer.print(headers.getTimeHeader());
         }
 
         // print header for the counts
         printer.print("Count");
 
         // print statistic header for each data header
-        for (String header : dataSetHeaders) {
+        for (String header : headers.getDataHeaders()) {
             for (String statsHeader : STATS_HEADERS) {
                 printer.print(header + " - " + statsHeader);
             }
@@ -163,7 +163,7 @@ public class DataFileWriter implements Closeable {
         private boolean sameColumn = false;
         private Delimiter delimiter = Delimiter.DEFAULT;
         private boolean timeBeforeDate = false;
-        private List<String> headers = Collections.emptyList();
+        private Headers.Builder headersBuilder = new Headers.Builder();
 
         private Builder(Writer writer) {
             this.writer = writer;
@@ -194,8 +194,23 @@ public class DataFileWriter implements Closeable {
             return this;
         }
 
-        public Builder withHeaders(List<String> headers) {
-            this.headers = headers;
+        public Builder withDataHeaders(List<String> headers) {
+            headersBuilder.dataHeaders(headers);
+            return this;
+        }
+
+        public Builder withDataHeaders(String... headers) {
+            headersBuilder.dataHeaders(headers);
+            return this;
+        }
+
+        public Builder withDateHeader(String header) {
+            headersBuilder.dateHeader(header);
+            return this;
+        }
+
+        public Builder withTimeHeader(String header) {
+            headersBuilder.dateHeader(header);
             return this;
         }
 
@@ -205,7 +220,7 @@ public class DataFileWriter implements Closeable {
                     TimestampFormatter.ofPattern(datePattern),
                     TimestampFormatter.ofPattern(timePattern),
                     sameColumn ? delimiter : null,
-                    timeBeforeDate, headers);
+                    timeBeforeDate, headersBuilder.build());
         }
 
     }

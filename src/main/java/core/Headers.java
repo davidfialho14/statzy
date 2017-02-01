@@ -1,5 +1,8 @@
 package core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,6 +57,42 @@ public class Headers {
      */
     public String getTimeHeader() {
         return timeHeader;
+    }
+
+    public static Builder with() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private List<String> dataHeaders = Collections.emptyList();
+        private String dateHeader = "Date";
+        private String timeHeader = "Time";
+
+        public Builder dataHeaders(String... headers) {
+            dataHeaders = Arrays.asList(headers);
+            return this;
+        }
+
+        public Builder dataHeaders(List<String> headers) {
+            dataHeaders = headers;
+            return this;
+        }
+
+        public Builder dateHeader(String header) {
+            dateHeader = header;
+            return this;
+        }
+
+        public Builder timeHeader(String header) {
+            timeHeader = header;
+            return this;
+        }
+
+        public Headers build() {
+            return new Headers(dataHeaders, dateHeader, timeHeader);
+        }
+
     }
 
 }

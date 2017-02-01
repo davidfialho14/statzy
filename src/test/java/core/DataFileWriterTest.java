@@ -36,7 +36,7 @@ public class DataFileWriterTest {
 
         try (
                 DataFileWriter writer = DataFileWriter.outputTo(output)
-                        .withHeaders(Collections.singletonList("H1"))
+                        .withDataHeaders(Collections.singletonList("H1"))
                         .withDatePattern(datePattern)
                         .withTimePattern(timePattern)
                         .inSameColumn(false)
@@ -58,7 +58,7 @@ public class DataFileWriterTest {
 
         try (
                 DataFileWriter writer = DataFileWriter.outputTo(output)
-                        .withHeaders(Arrays.asList("H1", "H2"))
+                        .withDataHeaders(Arrays.asList("H1", "H2"))
                         .withDatePattern(datePattern)
                         .withTimePattern(timePattern)
                         .inSameColumn(false)
@@ -80,7 +80,7 @@ public class DataFileWriterTest {
 
         try (
                 DataFileWriter writer = DataFileWriter.outputTo(output)
-                        .withHeaders(Collections.singletonList("H1"))
+                        .withDataHeaders(Collections.singletonList("H1"))
                         .withDatePattern(datePattern)
                         .withTimePattern(timePattern)
                         .inSameColumn(true)
@@ -102,7 +102,7 @@ public class DataFileWriterTest {
 
         try (
                 DataFileWriter writer = DataFileWriter.outputTo(output)
-                        .withHeaders(Collections.singletonList("H1"))
+                        .withDataHeaders(Collections.singletonList("H1"))
                         .withDatePattern(datePattern)
                         .withTimePattern(timePattern)
                         .inSameColumn(true)
@@ -124,7 +124,7 @@ public class DataFileWriterTest {
 
         try (
                 DataFileWriter writer = DataFileWriter.outputTo(output)
-                        .withHeaders(Collections.singletonList("H1"))
+                        .withDataHeaders(Collections.singletonList("H1"))
                         .withDatePattern(datePattern)
                         .withTimePattern(timePattern)
                         .inSameColumn(false)
@@ -145,7 +145,7 @@ public class DataFileWriterTest {
 
         try (
                 DataFileWriter writer = DataFileWriter.outputTo(new StringWriter())
-                        .withHeaders(Collections.singletonList("H1"))
+                        .withDataHeaders(Collections.singletonList("H1"))
                         .build()
         ) {
             catcher.expect(IllegalArgumentException.class);
@@ -159,7 +159,7 @@ public class DataFileWriterTest {
 
         try (
                 DataFileWriter writer = DataFileWriter.outputTo(new StringWriter())
-                        .withHeaders(Collections.singletonList("H1"))
+                        .withDataHeaders(Collections.singletonList("H1"))
                         .build()
         ) {
             catcher.expect(IllegalArgumentException.class);
