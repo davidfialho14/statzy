@@ -197,6 +197,11 @@ public class DataRecordFactory {
             return this;
         }
 
+        public Builder ignoreColumns(Collection<Integer> columns) {
+            this.ignoredColumns.addAll(columns);
+            return this;
+        }
+
         public DataRecordFactory build() {
 
             String timestampPattern;
