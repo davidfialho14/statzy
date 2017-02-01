@@ -12,8 +12,12 @@ import java.util.List;
  */
 public class DataFileWriter implements Closeable {
 
+    private static final char DELIMITER = ',';
     private final CSVPrinter printer;
-    private final TimestampFormatter formatter;
+    private final TimestampFormatter dateFormatter;
+    private final TimestampFormatter timeFormatter;
+    private final Delimiter delimiter;  // might be null: indicates the date and time are in different columns
+    private final boolean timeBeforeDate;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -21,16 +25,17 @@ public class DataFileWriter implements Closeable {
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    public DataFileWriter(Writer writer, TimestampFormatter formatter) throws IOException {
+    public DataFileWriter(Writer writer, TimestampFormatter dateFormatter, TimestampFormatter timeFormatter,
+                          Delimiter delimiter, boolean timeBeforeDate) throws IOException {
+
         printer = CSVFormat.EXCEL
-                .withDelimiter(',')
+                .withDelimiter(DELIMITER)
                 .print(writer);
 
-        this.formatter = formatter;
-    }
-
-    public DataFileWriter(File csvFile, TimestampFormatter formatter) throws IOException {
-        this(new FileWriter(csvFile), formatter);
+        this.dateFormatter = dateFormatter;
+        this.timeFormatter = timeFormatter;
+        this.delimiter = delimiter;
+        this.timeBeforeDate = timeBeforeDate;
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -58,15 +63,30 @@ public class DataFileWriter implements Closeable {
                     "do not have the same number of values");
         }
 
-        printer.print(formatter.format(timestamp));
+        String date = dateFormatter.format(timestamp);
+        String time = timeFormatter.format(timestamp);
+
+        if (delimiter == null) {
+            if (timeBeforeDate) {
+                printer.print(time);
+                printer.print(date);
+            } else {
+                printer.print(date);
+                printer.print(time);
+            }
+
+        } else {
+            printer.print(date + delimiter + time);
+        }
+
         printer.print(count);
 
         Iterator<Double> meansIterator = means.iterator();
-        Iterator<Double> standardDevationsIterator = standardDeviations.iterator();
+        Iterator<Double> standardDeviationsIterator = standardDeviations.iterator();
 
         while (meansIterator.hasNext()) {   // while
             printer.print(meansIterator.next());
-            printer.print(standardDevationsIterator.next());
+            printer.print(standardDeviationsIterator.next());
         }
 
         printer.println();
@@ -82,5 +102,68 @@ public class DataFileWriter implements Closeable {
         printer.close();
     }
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     *  Builder class
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    public static Builder outputTo(Writer writer) {
+        return new Builder(writer);
+    }
+
+    public static Builder outputTo(File outputFile) throws IOException {
+        return new Builder(new FileWriter(outputFile));
+    }
+
+    public static class Builder {
+
+        private final Writer writer;
+
+        private String datePattern = "dd/MM/uuuu";
+        private String timePattern = "HH:mm:ss";
+        private boolean sameColumn = false;
+        private Delimiter delimiter = Delimiter.DEFAULT;
+        private boolean timeBeforeDate = false;
+
+        private Builder(Writer writer) {
+            this.writer = writer;
+        }
+
+        public Builder withDatePattern(String pattern) {
+            datePattern = pattern;
+            return this;
+        }
+
+        public Builder withTimePattern(String pattern) {
+            timePattern = pattern;
+            return this;
+        }
+
+        public Builder inSameColumn(boolean sameColumn) {
+            this.sameColumn = sameColumn;
+            return this;
+        }
+
+        public Builder delimitedBy(Delimiter delimiter) {
+            this.delimiter = delimiter;
+            return this;
+        }
+
+        public Builder withTimeBeforeDate(boolean timeBeforeDate) {
+            this.timeBeforeDate = timeBeforeDate;
+            return this;
+        }
+
+        public DataFileWriter build() throws IOException {
+
+            return new DataFileWriter(writer,
+                    TimestampFormatter.ofPattern(datePattern),
+                    TimestampFormatter.ofPattern(timePattern),
+                    sameColumn ? delimiter : null,
+                    timeBeforeDate);
+        }
+
+    }
 
 }
