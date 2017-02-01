@@ -200,10 +200,15 @@ public class DataRecordFactory {
         public DataRecordFactory build() {
 
             String timestampPattern;
-            if (timeBeforeDate) {
-                timestampPattern = timePattern + delimiter + datePattern;
+            if (dateColumn == timeColumn) {
+                if (timeBeforeDate) {
+                    timestampPattern = timePattern + delimiter + datePattern;
+                } else {
+                    timestampPattern = datePattern + delimiter + timePattern;
+                }
+
             } else {
-                timestampPattern = datePattern + delimiter + timePattern;
+                timestampPattern = datePattern + Delimiter.DEFAULT + timePattern;
             }
 
             return new DataRecordFactory(columnCount, dateColumn, timeColumn, ignoredColumns,

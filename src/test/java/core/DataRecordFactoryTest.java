@@ -191,6 +191,21 @@ public class DataRecordFactoryTest {
     }
 
     @Test
+    public void getDataRecord_DateAndTimeInDifferentColumnsAndDelimiterIsTab_IgnoresDelimiter() throws Exception {
+        dataRecordFactory = factoryExpectingItemCountPerRecord(4)
+                .withDateInColumn(0)
+                .withTimeInColumn(1)
+                .delimitedBy(Delimiter.TAB)
+                .build();
+
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
+        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+
+        assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("09/08/2016", "11:22:33", "176", "186")),
+                is(new DataRecord(expectedTimestamp, expectedValues)));
+    }
+
+    @Test
     public void constructor_SetFactoryWithDateColumnOverTheColumnCount_RaisesParseException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         factoryExpectingItemCountPerRecord(4)
