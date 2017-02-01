@@ -187,8 +187,8 @@ public class DataRecordFactory {
             return this;
         }
 
-        public Builder withTimeBeforeDate() {
-            timeBeforeDate = true;
+        public Builder withTimeBeforeDate(boolean timeBeforeDate) {
+            this.timeBeforeDate = timeBeforeDate;
             return this;
         }
 

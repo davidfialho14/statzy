@@ -122,7 +122,7 @@ public class DataRecordFactoryTest {
     public void getDataRecord_HavingTimeBeforeDateInTheSameColumn_GetsRecordWithCorrectTimestamp() throws Exception {
         dataRecordFactory = factoryExpectingItemCountPerRecord(3)
                 .withDateAndTimeInColumn(0)
-                .withTimeBeforeDate()
+                .withTimeBeforeDate(true)
                 .build();
 
         Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
@@ -143,6 +143,50 @@ public class DataRecordFactoryTest {
         List<Double> expectedValues = Arrays.asList(176.0, 186.0);
 
         assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("09/08/2016\t11:22:33", "176", "186")),
+                is(new DataRecord(expectedTimestamp, expectedValues)));
+    }
+
+    @Test
+    public void getDataRecord_HavingTimeBeforeDateInDifferentColumns_GetsRecordWithCorrectTimestamp() throws Exception {
+        dataRecordFactory = factoryExpectingItemCountPerRecord(4)
+                .withTimeInColumn(0)
+                .withDateInColumn(1)
+                .build();
+
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
+        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+
+        assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("11:22:33", "09/08/2016", "176", "186")),
+                is(new DataRecord(expectedTimestamp, expectedValues)));
+    }
+
+    @Test
+    public void getDataRecord_HavingTimeAndDateInLastColumns_GetsRecordWithCorrectTimestampAndValues() throws Exception {
+        dataRecordFactory = factoryExpectingItemCountPerRecord(4)
+                .withTimeInColumn(2)
+                .withDateInColumn(3)
+                .build();
+
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
+        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+
+        assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("176", "186", "11:22:33", "09/08/2016")),
+                is(new DataRecord(expectedTimestamp, expectedValues)));
+    }
+
+    @Test
+    public void
+    getDataRecord_HavingDateAndTimeSpecifiedSeparatelyInSameColumn_GetsRecordWithCorrectTimestampAndValues() throws Exception {
+        dataRecordFactory = factoryExpectingItemCountPerRecord(3)
+                .withTimeInColumn(0)
+                .withDateInColumn(0)
+                .delimitedBy(Delimiter.SPACE)
+                .build();
+
+        Timestamp expectedTimestamp = Timestamp.of(2016, 8, 9, 11, 22, 33);
+        List<Double> expectedValues = Arrays.asList(176.0, 186.0);
+
+        assertThat(dataRecordFactory.getDataRecord(fakeRawRecord("09/08/2016 11:22:33", "176", "186")),
                 is(new DataRecord(expectedTimestamp, expectedValues)));
     }
 
