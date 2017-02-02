@@ -58,6 +58,12 @@ public abstract class FileTextField extends HBox implements Initializable {
         checkMarkImageView.setImage(isValid() ? validImage : invalidImage);
     }
 
+    public void setFile(File file) {
+        this.file = file;
+        textField.setText(file.getPath());
+        updateImage();
+    }
+
     abstract protected boolean isValid();
 
 }

@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane hgap="10.0" prefHeight="460.0" prefWidth="885.0" vgap="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.Controller">
+<GridPane fx:id="mainPain" hgap="10.0" prefHeight="460.0" prefWidth="885.0" vgap="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.Controller">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
     <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="645.0" />
@@ -34,13 +34,13 @@
       <Label text="Data File:" />
       <Label text="Headers File:" GridPane.rowIndex="1" />
       <Label text="Output Path:" GridPane.rowIndex="2" />
-      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseDataFile" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
       </Button>
-      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseHeadersFile" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseOutputPath" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
       <Separator GridPane.columnSpan="4" GridPane.rowIndex="3" />
       <GridPane alignment="TOP_RIGHT" hgap="10.0" maxWidth="1.7976931348623157E308" prefHeight="332.0" prefWidth="894.0" vgap="10.0" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
         <columnConstraints>

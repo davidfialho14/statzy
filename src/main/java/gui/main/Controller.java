@@ -1,9 +1,13 @@
 package gui.main;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
+import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -16,6 +20,7 @@ public class Controller implements Initializable {
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    @FXML private GridPane mainPain;
     @FXML private InputFileTextField dataFileTextField;
     @FXML private InputFileTextField headersFileTextField;
     @FXML private OutputFileTextField outputFileTextField;
@@ -25,6 +30,8 @@ public class Controller implements Initializable {
      *  Private Fields
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    private final FileChooser fileChooser = new FileChooser();
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -58,4 +65,27 @@ public class Controller implements Initializable {
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    public void chooseDataFile(ActionEvent actionEvent) {
+        chooseInputFile(dataFileTextField);
+    }
+
+    public void chooseHeadersFile(ActionEvent actionEvent) {
+        chooseInputFile(headersFileTextField);
+    }
+
+    private void chooseInputFile(InputFileTextField fileTextField) {
+        File file = fileChooser.showOpenDialog(mainPain.getScene().getWindow());
+
+        if (file != null) {
+            fileTextField.setFile(file);
+        }
+    }
+
+    public void chooseOutputPath(ActionEvent actionEvent) {
+        File file = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
+
+        if (file != null) {
+            outputFileTextField.setFile(file);
+        }
+    }
 }
