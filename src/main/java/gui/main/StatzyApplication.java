@@ -10,7 +10,7 @@ public class StatzyApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("gui.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxmls/gui.fxml"));
 
         primaryStage.setTitle("Statzy");
         primaryStage.setScene(new Scene(root));
