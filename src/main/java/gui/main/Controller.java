@@ -1,17 +1,24 @@
 package gui.main;
 
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.image.Image;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
+
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
      *  Private Inner Nodes
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    @FXML private InputFileTextField dataFileTextField;
+    @FXML private InputFileTextField headersFileTextField;
+    @FXML private OutputFileTextField outputFileTextField;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -36,6 +43,12 @@ public class Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        FileTextField.setImages(new Image("/images/valid_check_mark.png"),
+                new Image("/images/invalid_check_mark.png"));
+
+        dataFileTextField.updateImage();
+        headersFileTextField.updateImage();
+        outputFileTextField.updateImage();
 
     }
 
