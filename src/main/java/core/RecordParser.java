@@ -5,7 +5,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.Iterator;
 
 /**
@@ -50,10 +49,10 @@ public class RecordParser implements Closeable {
      * are ignored.  If the file does not have anymore non-empty lines, then it returns null.
      *
      * @return the next data record in the file or null if the file does not have anymore non-empty lines.
-     * @throws ParseException if the number of values is the next row is different from the previous record
+     * @throws IllegalRecordSizeException if the number of values is the next row is different from the previous record
      * parsed. If it is the first record then it never throws a ParseException.
      */
-    public Record parseRecord() throws ParseException {
+    public Record parseRecord() throws IllegalRecordSizeException {
         Record record = null;
 
         while (recordIterator.hasNext() && record == null) {
@@ -72,8 +71,9 @@ public class RecordParser implements Closeable {
 
             } else if (csvRecord.size() != expectedColumnCount) {
                 // this record has different number of columns than expected
-                throw new ParseException("Record has " + csvRecord.size() + " values, but " +
-                        expectedColumnCount + " values were expected.", (int) csvRecord.getRecordNumber());
+                throw new IllegalRecordSizeException("Record has " + csvRecord.size() + " values, but " +
+                        expectedColumnCount + " values were expected.", (int) csvRecord.getRecordNumber(),
+                        expectedColumnCount, csvRecord.size());
             }
 
             record = Record.from(csvRecord);
