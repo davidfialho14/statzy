@@ -63,29 +63,29 @@
          <children>
             <Label text="Group Period:" GridPane.rowIndex="1" />
             <Label text="Date Format:" />
-            <ChoiceBox maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-            <Spinner maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <ChoiceBox maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <ChoiceBox fx:id="dateFormatChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+            <Spinner fx:id="periodSpinner" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ChoiceBox fx:id="periodUnitChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <Label text="Time Format:" GridPane.columnIndex="3" />
             <Label text="Delimiter:" GridPane.columnIndex="5" />
-            <ChoiceBox maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="4" />
-            <ChoiceBox maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="6" />
+            <ChoiceBox fx:id="timeFormatChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="4" />
+            <ChoiceBox fx:id="delimiterChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="6" />
             <TableView maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="8" GridPane.rowIndex="2" GridPane.rowSpan="2" />
             <VBox maxWidth="-Infinity" prefHeight="65.0" prefWidth="94.0" spacing="5.0" GridPane.columnIndex="8" GridPane.rowIndex="2">
                <children>
-                  <Button defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Run" />
+                  <Button fx:id="runButton" defaultButton="true" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Run" />
                   <Button cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#close" text="Close" />
                </children>
             </VBox>
             <VBox maxWidth="-Infinity" prefWidth="80.0" spacing="5.0" GridPane.columnIndex="8" GridPane.rowIndex="3">
                <children>
-                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Date">
+                  <ToggleButton fx:id="dateToggle" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Date">
                      <toggleGroup>
                         <ToggleGroup fx:id="selectGroup" />
                      </toggleGroup>
                   </ToggleButton>
-                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Time" toggleGroup="$selectGroup" />
-                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Ignore" toggleGroup="$selectGroup" />
+                  <ToggleButton fx:id="timeToggle" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Time" toggleGroup="$selectGroup" />
+                  <ToggleButton fx:id="ignoreToggle" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Ignore" toggleGroup="$selectGroup" />
                </children>
                <GridPane.margin>
                   <Insets top="20.0" />

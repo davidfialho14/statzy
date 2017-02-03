@@ -1,5 +1,7 @@
 package gui.main;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -27,7 +29,8 @@ public abstract class FileTextField extends HBox implements Initializable {
     @FXML private TextField textField;
     @FXML private ImageView checkMarkImageView;
 
-    protected File file = new File("");
+    private File file = new File("");
+    private BooleanProperty isValid = new SimpleBooleanProperty(false);
 
     public FileTextField() {
 
@@ -48,10 +51,17 @@ public abstract class FileTextField extends HBox implements Initializable {
         textField.textProperty().addListener((observable, oldText, newText) -> {
             //assign file to the new path
             file = new File(newText);
+            isValid.setValue(isValid(file));
 
             // adjust the check mark to valid/invalid
             updateImage();
         });
+
+        isValid.addListener((observable, oldValue, newValue) -> { if (oldValue != newValue) updateImage(); });
+    }
+
+    public BooleanProperty validityProperty() {
+        return isValid;
     }
 
     public void updateImage() {
@@ -61,9 +71,13 @@ public abstract class FileTextField extends HBox implements Initializable {
     public void setFile(File file) {
         this.file = file;
         textField.setText(file.getPath());
-        updateImage();
+        isValid.setValue(isValid(file));
     }
 
-    abstract protected boolean isValid();
+    public boolean isValid() {
+        return isValid.getValue();
+    }
+
+    abstract protected boolean isValid(File file);
 
 }
