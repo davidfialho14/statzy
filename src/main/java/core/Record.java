@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVRecord;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Record corresponds to a row in a CSV file. The row will have multiple values (corresponding to different
@@ -82,6 +83,14 @@ public class Record implements Iterable<String> {
     @Override
     public Iterator<String> iterator() {
         return null;
+    }
+
+    /**
+     * Returns a sequential Stream with the record values as its source.
+     * @return sequential stream over the values in this record.
+     */
+    public Stream<String> stream() {
+        return values.stream();
     }
 
     /**
