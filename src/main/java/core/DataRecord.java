@@ -33,7 +33,7 @@ public class DataRecord {
      * @param timestamp  timestamp to associate with the record.
      * @param dataValues data values for the record.
      */
-    public static DataRecord dataRecord(Timestamp timestamp, Double... dataValues) {
+    public static DataRecord with(Timestamp timestamp, Double... dataValues) {
         return new DataRecord(timestamp, Arrays.asList(dataValues));
     }
 
