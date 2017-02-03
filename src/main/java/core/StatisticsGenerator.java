@@ -20,13 +20,14 @@ public class StatisticsGenerator {
      * @param period     the period defined for each data group.
      * @throws ParseException if the input data file is not valid or some line in the file is corrupted.
      */
-    public void process(DataFileReader dataReader, DataFileWriter dataWriter, Period period)
+    public void process(DataRecordReader dataReader, DataFileWriter dataWriter, Period period)
             throws ParseException, IOException {
 
         DataRecord record = dataReader.read();  // read first record
         if (record == null) return;
 
-        GroupStatistics groupStatistics = new GroupStatistics(dataReader.getExpectedValueCount());
+        int valueCount = record.getDataValues().size();
+        GroupStatistics groupStatistics = new GroupStatistics(valueCount);
 
         Timestamp currentPeriod = record.getTimestamp().truncatedTo(period.getUnit());
         Timestamp nextPeriod = currentPeriod.plus(period);
