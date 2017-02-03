@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane fx:id="mainPain" hgap="10.0" prefHeight="460.0" prefWidth="885.0" vgap="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.Controller">
+<GridPane fx:id="mainPain" hgap="5.0" prefHeight="460.0" prefWidth="885.0" vgap="5.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.Controller">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
     <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="645.0" />
@@ -42,7 +42,7 @@
       <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseHeadersFile" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
       <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseOutputPath" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
       <Separator GridPane.columnSpan="4" GridPane.rowIndex="3" />
-      <GridPane alignment="TOP_RIGHT" hgap="10.0" maxWidth="1.7976931348623157E308" prefHeight="332.0" prefWidth="894.0" vgap="10.0" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
+      <GridPane alignment="TOP_RIGHT" hgap="5.0" maxWidth="1.7976931348623157E308" prefHeight="332.0" prefWidth="894.0" vgap="5.0" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
         <columnConstraints>
           <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
             <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="75.0" />
@@ -57,7 +57,7 @@
         <rowConstraints>
           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER" />
           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER" />
-            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="55.0" vgrow="ALWAYS" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="60.0" prefHeight="140.0" vgrow="ALWAYS" />
         </rowConstraints>
          <children>
@@ -74,7 +74,7 @@
             <VBox maxWidth="-Infinity" prefHeight="65.0" prefWidth="94.0" spacing="5.0" GridPane.columnIndex="8" GridPane.rowIndex="2">
                <children>
                   <Button defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Run" />
-                  <Button cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Close" />
+                  <Button cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#close" text="Close" />
                </children>
             </VBox>
             <VBox maxWidth="-Infinity" prefWidth="80.0" spacing="5.0" GridPane.columnIndex="8" GridPane.rowIndex="3">
@@ -85,7 +85,11 @@
                      </toggleGroup>
                   </ToggleButton>
                   <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Time" toggleGroup="$selectGroup" />
+                  <ToggleButton maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Ignore" toggleGroup="$selectGroup" />
                </children>
+               <GridPane.margin>
+                  <Insets top="20.0" />
+               </GridPane.margin>
             </VBox>
          </children>
          <GridPane.margin>

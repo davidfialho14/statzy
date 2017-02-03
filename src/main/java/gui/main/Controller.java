@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
@@ -87,5 +88,13 @@ public class Controller implements Initializable {
         if (file != null) {
             outputFileTextField.setFile(file);
         }
+    }
+
+    /**
+     * Invoked when the close button is clicked. Closes the program.
+     */
+    public void close() {
+        Stage stage = (Stage) mainPain.getScene().getWindow();
+        stage.close();
     }
 }
