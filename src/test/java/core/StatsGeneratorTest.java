@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import static core.DataRecord.dataRecord;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -20,16 +19,16 @@ public class StatsGeneratorTest {
     private StatisticsGenerator statisticsGenerator = new StatisticsGenerator();
 
     @Mock
-    private DataFileReader dataFileReaderStub;
+    private DataRecordReader dataReader;
 
     @Mock
     private DataFileWriter dataFileWriterMock;
 
-    private void setupDataFileReader(List<DataRecord> records) throws ParseException {
+    private void setupDataRecordReader(List<DataRecord> records) throws ParseException {
 
         Iterator<DataRecord> iterator = records.iterator();
 
-        when(dataFileReaderStub.read()).thenAnswer(invocationOnMock -> {
+        when(dataReader.read()).thenAnswer(invocationOnMock -> {
             if (iterator.hasNext()) {
                 return iterator.next();
             } else {
@@ -37,12 +36,6 @@ public class StatsGeneratorTest {
             }
         });
 
-        int expectedValueCount = 0;
-        if (!records.isEmpty()) {
-            expectedValueCount = records.get(0).getDataValues().size();
-        }
-
-        when(dataFileReaderStub.getExpectedValueCount()).thenReturn(expectedValueCount);
     }
 
     private static List<Double> means(Double... means) {
@@ -56,13 +49,13 @@ public class StatsGeneratorTest {
     @Test
     public void process_3RecordsWithinTheFirstPeriodOf5Seconds_OutputsASinglePeriodWithCorrectStats() throws Exception {
         List<DataRecord> records = Arrays.asList(
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 0), 5.5),
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 2), 4.5),
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 4), 6.5)
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 0), 5.5),
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 2), 4.5),
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 4), 6.5)
         );
-        setupDataFileReader(records);
+        setupDataRecordReader(records);
 
-        statisticsGenerator.process(dataFileReaderStub, dataFileWriterMock, Period.of(5, Unit.SECONDS));
+        statisticsGenerator.process(dataReader, dataFileWriterMock, Period.of(5, Unit.SECONDS));
 
         verify(dataFileWriterMock, times(1))
                 .write(Timestamp.of(2016, 10, 10, 10, 10, 0), 3, means(5.5), stdevs(1.0));
@@ -72,13 +65,13 @@ public class StatsGeneratorTest {
     public void
     process_1RecordsInTheFirstPeriodOf5SecondsAnd2InTheSecondPeriod_OutputsTwoPeriods() throws Exception {
         List<DataRecord> records = Arrays.asList(
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 0), 5.5),
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 5), 4.5),
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 7), 7.5)
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 0), 5.5),
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 5), 4.5),
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 7), 7.5)
         );
-        setupDataFileReader(records);
+        setupDataRecordReader(records);
 
-        statisticsGenerator.process(dataFileReaderStub, dataFileWriterMock, Period.of(5, Unit.SECONDS));
+        statisticsGenerator.process(dataReader, dataFileWriterMock, Period.of(5, Unit.SECONDS));
 
         verify(dataFileWriterMock)
                 .write(Timestamp.of(2016, 10, 10, 10, 10, 0), 1, means(5.5), stdevs(0.0));
@@ -90,13 +83,13 @@ public class StatsGeneratorTest {
     public void
     process_1RecordsInTheFirstPeriodOf5SecondsAnd2InTheThirdPeriod_OutputsThreePeriods() throws Exception {
         List<DataRecord> records = Arrays.asList(
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 0), 5.5),
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 10), 4.5),
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 10, 14), 7.5)
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 0), 5.5),
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 10), 4.5),
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 10, 14), 7.5)
         );
-        setupDataFileReader(records);
+        setupDataRecordReader(records);
 
-        statisticsGenerator.process(dataFileReaderStub, dataFileWriterMock, Period.of(5, Unit.SECONDS));
+        statisticsGenerator.process(dataReader, dataFileWriterMock, Period.of(5, Unit.SECONDS));
 
         verify(dataFileWriterMock)
                 .write(Timestamp.of(2016, 10, 10, 10, 10, 0), 1, means(5.5), stdevs(0.0));
@@ -110,9 +103,9 @@ public class StatsGeneratorTest {
     public void
     process_0Records_DoesNotOutputAnything() throws Exception {
         List<DataRecord> records = Collections.emptyList();
-        setupDataFileReader(records);
+        setupDataRecordReader(records);
 
-        statisticsGenerator.process(dataFileReaderStub, dataFileWriterMock, Period.of(5, Unit.SECONDS));
+        statisticsGenerator.process(dataReader, dataFileWriterMock, Period.of(5, Unit.SECONDS));
 
         verify(dataFileWriterMock, never()).write(any(), anyInt(), anyList(), anyList());
     }
@@ -121,11 +114,11 @@ public class StatsGeneratorTest {
     public void
     process_1Record_OutputsASinglePeriod() throws Exception {
         List<DataRecord> records = Collections.singletonList(
-                dataRecord(Timestamp.of(2016, 10, 10, 10, 1, 10), 5.5)
+                DataRecord.with(Timestamp.of(2016, 10, 10, 10, 1, 10), 5.5)
         );
-        setupDataFileReader(records);
+        setupDataRecordReader(records);
 
-        statisticsGenerator.process(dataFileReaderStub, dataFileWriterMock, Period.of(5, Unit.MINUTES));
+        statisticsGenerator.process(dataReader, dataFileWriterMock, Period.of(5, Unit.MINUTES));
 
         verify(dataFileWriterMock)
                 .write(Timestamp.of(2016, 10, 10, 10, 1, 0), 1, means(5.5), stdevs(0.0));

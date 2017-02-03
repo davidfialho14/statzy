@@ -19,10 +19,19 @@ import java.util.stream.IntStream;
  */
 public class HeadersReader implements Closeable {
 
-    private final CSVParser parser;
+    private final HeadersParser parser;
     private final int dateColumn;
     private final int timeColumn;
     private final Set<Integer> ignoredColumns;
+
+    HeadersReader(HeadersParser parser, int dateColumn, int timeColumn, Set<Integer> ignoredColumns)
+            throws IOException {
+
+        this.parser = parser;
+        this.dateColumn = dateColumn;
+        this.timeColumn = timeColumn;
+        this.ignoredColumns = ignoredColumns;
+    }
 
     /**
      * Creates a headers reader with the date, time, ignored columns specified.
@@ -36,10 +45,7 @@ public class HeadersReader implements Closeable {
     public HeadersReader(Reader reader, int dateColumn, int timeColumn, Set<Integer> ignoredColumns)
             throws IOException {
 
-        this.parser = CSVFormat.EXCEL.withDelimiter(',').parse(reader);
-        this.dateColumn = dateColumn;
-        this.timeColumn = timeColumn;
-        this.ignoredColumns = ignoredColumns;
+        this(new HeadersParser(reader), dateColumn, timeColumn, ignoredColumns);
     }
 
     /**
@@ -68,19 +74,13 @@ public class HeadersReader implements Closeable {
      */
     public Headers read() throws IOException, ParseException {
 
-        Iterator<CSVRecord> iterator = parser.iterator();
+        List<String> headers = parser.parse();
 
-        if (!iterator.hasNext()) {
-            throw new ParseException("Headers file is empty", 1);
-        }
-
-        // read header names record - required record
-        CSVRecord namesRecord = iterator.next();
-        List<String> headers = parseHeaderNames(namesRecord);
-
-        if (iterator.hasNext()) {
-            CSVRecord unitTagsRecord = iterator.next();
-            appendHeaderUnitTagsTo(headers, unitTagsRecord);
+        // check if there are enough headers to include the date and time columns
+        int minimumHeadersRequired = Math.max(dateColumn, timeColumn) + 1;
+        if (headers.size() < minimumHeadersRequired) {
+            throw new ParseException("Headers file was expected to have at least " + minimumHeadersRequired +
+                    " header names, but got only " + headers.size() + ".", 1);
         }
 
         // get the date and time headers
