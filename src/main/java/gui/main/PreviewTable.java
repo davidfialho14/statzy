@@ -152,11 +152,9 @@ public class PreviewTable extends GridPane implements Initializable {
 
                 if (dateToggle.isSelected()) {
                     selectSingleColumn(dateColumn, dateToggle);
-                    System.out.println("date: " + dateColumn);
 
                 } else if (timeToggle.isSelected()) {
                     selectSingleColumn(timeColumn, timeToggle);
-                    System.out.println("time: " + timeColumn);
 
                 } else if (ignoreToggle.isSelected()) {
 
@@ -170,7 +168,6 @@ public class PreviewTable extends GridPane implements Initializable {
                         }
                     }
 
-                    System.out.println("ignored: " + ignoredColumns);
                 }
 
             });
