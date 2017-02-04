@@ -15,6 +15,10 @@ public enum Unit {
             return timestamp.truncatedToYears();
         }
 
+        @Override
+        public String toString() {
+            return "Year(s)";
+        }
     },
 
     MONTHS(ChronoUnit.MONTHS) {
@@ -24,12 +28,39 @@ public enum Unit {
             return timestamp.truncatedToMonths();
         }
 
+        @Override
+        public String toString() {
+            return "Month(s)";
+        }
     },
 
-    DAYS(ChronoUnit.DAYS),
-    HOURS(ChronoUnit.HOURS),
-    MINUTES(ChronoUnit.MINUTES),
-    SECONDS(ChronoUnit.SECONDS);
+    DAYS(ChronoUnit.DAYS) {
+        @Override
+        public String toString() {
+            return "Day(s)";
+        }
+    },
+
+    HOURS(ChronoUnit.HOURS) {
+        @Override
+        public String toString() {
+            return "Hour(s)";
+        }
+    },
+
+    MINUTES(ChronoUnit.MINUTES) {
+        @Override
+        public String toString() {
+            return "Minute(s)";
+        }
+    },
+
+    SECONDS(ChronoUnit.SECONDS) {
+        @Override
+        public String toString() {
+            return "Second(s)";
+        }
+    };
 
     private final ChronoUnit baseUnit;
 

@@ -1,10 +1,6 @@
 package gui.main;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import core.HeadersParser;
-import core.IllegalRecordSizeException;
-import core.Record;
-import core.RecordParser;
+import core.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,7 +17,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -36,11 +31,11 @@ public class Controller implements Initializable {
     @FXML private InputFileTextField dataFileTextField;
     @FXML private InputFileTextField headersFileTextField;
     @FXML private OutputFileTextField outputFileTextField;
-    @FXML private ChoiceBox dateFormatChoiceBox;
-    @FXML private ChoiceBox timeFormatChoiceBox;
-    @FXML private ChoiceBox delimiterChoiceBox;
-    @FXML private Spinner periodSpinner;
-    @FXML private ChoiceBox periodUnitChoiceBox;
+    @FXML private ChoiceBox<String> dateFormatChoiceBox;
+    @FXML private ChoiceBox<String> timeFormatChoiceBox;
+    @FXML private ChoiceBox<DelimiterOption> delimiterChoiceBox;
+    @FXML private Spinner<Integer> periodSpinner;
+    @FXML private ChoiceBox<Unit> periodUnitChoiceBox;
     @FXML private Button runButton;
     @FXML private PreviewTable previewTable;
 
@@ -51,6 +46,15 @@ public class Controller implements Initializable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     private final FileChooser fileChooser = new FileChooser();
+
+    private static final String[] DATE_FORMATS = {
+            "dd/MM/uuuu", "dd/MMM/uu", "dd/MMM/uuuu", "dd/MM/uu",
+            "dd-MM-uuuu", "dd-MMM-uu", "dd-MMM-uuuu", "dd-MM-uu",
+            "uuMMdd"
+    };
+    private static final String[] TIME_FORMATS = {
+            "HH:mm:ss", "HHmmss", "HH:mm"
+    };
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -107,6 +111,22 @@ public class Controller implements Initializable {
                 previewTable.clearData();
             }
         });
+
+        // add options to the choice boxes
+        dateFormatChoiceBox.getItems().addAll(DATE_FORMATS);
+        timeFormatChoiceBox.getItems().addAll(TIME_FORMATS);
+        delimiterChoiceBox.getItems().addAll(DelimiterOption.values());
+        periodUnitChoiceBox.getItems().addAll(Unit.values());
+
+        // select default values
+        dateFormatChoiceBox.getSelectionModel().selectFirst();
+        timeFormatChoiceBox.getSelectionModel().selectFirst();
+        delimiterChoiceBox.getSelectionModel().selectFirst();
+        periodUnitChoiceBox.getSelectionModel().selectFirst();
+
+        // set the period spinner to take only value over 0
+        periodSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
 
     }
 
