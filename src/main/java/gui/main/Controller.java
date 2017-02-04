@@ -1,25 +1,30 @@
 package gui.main;
 
-import core.DataFileWriter;
-import core.DataRecordFactory;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import core.HeadersParser;
+import core.IllegalRecordSizeException;
+import core.Record;
+import core.RecordParser;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -40,6 +45,7 @@ public class Controller implements Initializable {
     @FXML private ToggleButton timeToggle;
     @FXML private ToggleButton ignoreToggle;
     @FXML private Button runButton;
+    @FXML private PreviewTable previewTable;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -48,8 +54,6 @@ public class Controller implements Initializable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     private final FileChooser fileChooser = new FileChooser();
-    private DataRecordFactory.Builder dataRecordBuilder = null;
-    private DataFileWriter.Builder dataFileWriterBuilder = null;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -93,6 +97,28 @@ public class Controller implements Initializable {
 
         outputFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
             runButton.setDisable(!(isValid && dataFileTextField.isValid() && headersFileTextField.isValid()));
+        });
+
+        // load headers file when it is labeled as valid
+        headersFileTextField.pathProperty().addListener((observable, oldPath, newPath) -> {
+
+            if (headersFileTextField.isValid()) {
+                previewHeaders();
+            } else {
+                previewTable.clearHeaders();
+            }
+
+        });
+
+        // load data file when it is labeled as valid
+        dataFileTextField.pathProperty().addListener((observable, oldPath, newPath) -> {
+
+            if (dataFileTextField.isValid()) {
+                previewData();
+            } else {
+                previewTable.clearData();
+            }
+
         });
     }
 
@@ -149,6 +175,47 @@ public class Controller implements Initializable {
         dateToggle.setDisable(disable);
         timeToggle.setDisable(disable);
         ignoreToggle.setDisable(disable);
+    }
+
+    private static final int PREVIEW_RECORD_COUNT = 10;
+
+    private void previewData() {
+
+        try (RecordParser parser = new RecordParser(dataFileTextField.getFile())) {
+
+            List<Record> previewRecords = new ArrayList<>(PREVIEW_RECORD_COUNT);
+
+            for (int i = 0; i < PREVIEW_RECORD_COUNT; i++) {
+                Record record = parser.parseRecord();
+                if (record == null) break;
+
+                previewRecords.add(record);
+            }
+
+            previewTable.setData(previewRecords);
+
+        } catch (IOException | IllegalRecordSizeException | PreviewException e) {
+            dataFileTextField.setInvalid();
+
+            Alert alert = new Alert(Alert.AlertType.ERROR, WordUtils.wrap(e.getMessage(), 50), ButtonType.OK);
+            alert.setHeaderText("Data Preview Error");
+            alert.showAndWait();
+        }
+    }
+
+    private void previewHeaders() {
+
+        try (HeadersParser parser = new HeadersParser(headersFileTextField.getFile())) {
+            List<String> headers = parser.parse();
+            previewTable.setHeaders(headers);
+
+        } catch (IOException | ParseException | PreviewException e) {
+            headersFileTextField.setInvalid();
+            Alert alert = new Alert(Alert.AlertType.ERROR, WordUtils.wrap(e.getMessage(), 50), ButtonType.OK);
+            alert.setHeaderText("Header Preview Error");
+            alert.showAndWait();
+        }
+
     }
 
 }
