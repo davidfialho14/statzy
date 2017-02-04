@@ -2,8 +2,6 @@ package gui.main;
 
 import core.Record;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -51,7 +49,6 @@ public class PreviewTable extends TableView<Record> {
         headersAreSet = false;
 
         if (dataIsSet) {
-            System.out.println("set headers and data is set");
 
             if (headers.size() != getColumns().size()) {
                 // clear headers from all columns
@@ -67,7 +64,6 @@ public class PreviewTable extends TableView<Record> {
             }
 
         } else {
-            System.out.println("set headers and data is NOT set");
 
             getColumns().clear();
 
@@ -78,7 +74,6 @@ public class PreviewTable extends TableView<Record> {
         }
 
         headersAreSet = true;
-        System.out.println("headers were set");
     }
 
     /**
@@ -98,7 +93,6 @@ public class PreviewTable extends TableView<Record> {
         getItems().clear();
 
         if (headersAreSet) {
-            System.out.println("set data and headers are set");
 
             // ensure the number of columns occupied by the data matches the number of headers
             int recordSize = dataRecords.get(0).size();
@@ -109,7 +103,6 @@ public class PreviewTable extends TableView<Record> {
             }
 
         } else {
-            System.out.println("set data and headers NOT are set");
 
             getColumns().clear();
 
@@ -125,7 +118,6 @@ public class PreviewTable extends TableView<Record> {
         getItems().addAll(dataRecords.stream().collect(Collectors.toList()));
 
         dataIsSet = true;
-        System.out.println("data was set");
     }
 
     /**
@@ -141,7 +133,6 @@ public class PreviewTable extends TableView<Record> {
         }
 
         headersAreSet = false;
-        System.out.println("headers no longer set");
     }
 
     /**
@@ -157,7 +148,6 @@ public class PreviewTable extends TableView<Record> {
         }
 
         dataIsSet = false;
-        System.out.println("data no longer set");
     }
 
 }
