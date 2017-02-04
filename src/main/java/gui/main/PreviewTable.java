@@ -6,23 +6,24 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.ToggleButton;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
  *
  */
-public class PreviewTable extends GridPane {
+public class PreviewTable extends GridPane implements Initializable {
 
     @FXML private TableView<Record> tableView;
     @FXML private ToggleButton dateToggle;
@@ -48,6 +49,85 @@ public class PreviewTable extends GridPane {
         }
 
     }
+
+    /**
+     * Called to initialize a controller after its root element has been
+     * completely processed.
+     *
+     * @param location  The location used to resolve relative paths for the root object, or
+     *                  <tt>null</tt> if the location is not known.
+     * @param resources The resources used to localize the root object, or <tt>null</tt> if
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        // Ensure the selected columns are updated every time a new date/time/ignore column is selected
+        dateColumn.addListener((observable, oldValue, newValue) -> tableView.refresh());
+        timeColumn.addListener((observable, oldValue, newValue) -> tableView.refresh());
+        ignoredColumns.addListener((SetChangeListener<? super Integer>) change -> tableView.refresh());
+    }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     *  Cell class definition
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    private static class PreviewTableCell extends TableCell<Record, String> {
+
+        private final PreviewTableColumn column;
+
+        private PreviewTableCell(PreviewTableColumn column) {
+            this.column = column;
+        }
+
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (!isEmpty()) {
+
+                if (column.isDateColumn() && column.isTimeColumn()) {
+                    // make the cell blue
+                    this.setStyle(
+                            "-fx-background-color: #cfd9e8;" +
+                                    "-fx-border-color: #dbe4f3; " +
+                                    "-fx-border-width: 0.5"
+                    );
+
+                } else if (column.isDateColumn()) {
+                    // make the cell yellow
+                    this.setStyle(
+                            "-fx-background-color: #eeefa4;" +
+                                    "-fx-border-color: #fcffb3; " +
+                                    "-fx-border-width: 0.5"
+                    );
+
+                } else if (column.isTimeColumn()) {
+                    // make the cell green
+                    this.setStyle(
+                            "-fx-background-color: #b4e29b;" +
+                                    "-fx-border-color: #c2ffbe; " +
+                                    "-fx-border-width: 0.5"
+                    );
+
+                } else if (column.isIgnoredColumn()) {
+                    // make the cell gray
+                    this.setStyle(
+                            "-fx-text-fill: rgb(176,175,175);"
+                    );
+                }
+
+                setText(item);
+            }
+        }
+    }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     *  Column class definition
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * Gives the table column an index that can be used by the cell value factory to to get the correct value
@@ -103,10 +183,40 @@ public class PreviewTable extends GridPane {
             // since each row stores a list, the cell value for each column is the item in the position given
             // by the column index
             setCellValueFactory(param -> new SimpleStringProperty(param.getValue().get(index)));
+
+            // use PreviewTableCells instead of the default TableCells
+            setCellFactory(param -> new PreviewTableCell(this));
         }
 
         public void setHeader(String header) {
             button.setText(header);
+        }
+
+        /**
+         * Checks if this column is the date column.
+         *
+         * @return true if this column is the date column and false is otherwise.
+         */
+        public boolean isDateColumn() {
+            return index == dateColumn.getValue();
+        }
+
+        /**
+         * Checks if this column is the time column.
+         *
+         * @return true if this column is the time column and false is otherwise.
+         */
+        public boolean isTimeColumn() {
+            return index == timeColumn.getValue();
+        }
+
+        /**
+         * Checks if this column is being ignored.
+         *
+         * @return true if this column is being ignored and false if otherwise.
+         */
+        public boolean isIgnoredColumn() {
+            return ignoredColumns.contains(index);
         }
 
         private void selectSingleColumn(IntegerProperty columnIndex, ToggleButton toggle) {
@@ -121,6 +231,12 @@ public class PreviewTable extends GridPane {
         }
 
     }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *
+     *  Public Interface
+     *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * Sets the headers to be previewed. Headers are shown in the same order they are in the list.
