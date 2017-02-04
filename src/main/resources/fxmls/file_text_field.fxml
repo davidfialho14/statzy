@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+
+<fx:root alignment="CENTER_LEFT" spacing="5.0" type="HBox" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField fx:id="textField" editable="false" HBox.hgrow="ALWAYS" />
+      <ImageView fx:id="checkMarkImageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
+   </children>
+</fx:root>

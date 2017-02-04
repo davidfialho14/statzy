@@ -209,6 +209,10 @@ public class DataRecordReader implements Closeable {
             ignoredColumns.add(column);
         }
 
+        public void removeIgnoredColumn(Integer column) {
+            ignoredColumns.remove(column);
+        }
+
         public void setFile(File file) {
             this.file = file;
         }

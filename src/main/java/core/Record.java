@@ -3,6 +3,7 @@ package core;
 import org.apache.commons.csv.CSVRecord;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -91,6 +92,15 @@ public class Record implements Iterable<String> {
      */
     public Stream<String> stream() {
         return values.stream();
+    }
+
+    /**
+     * Returns a collection with the record values.
+     *
+     * @return collection with record values.
+     */
+    public Collection<String> toCollection() {
+        return values;
     }
 
     /**
