@@ -9,8 +9,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -71,21 +69,7 @@
             <ChoiceBox fx:id="timeFormatChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="4" />
             <ChoiceBox fx:id="delimiterChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="6" />
             <VBox maxWidth="-Infinity" prefHeight="65.0" prefWidth="94.0" spacing="5.0" GridPane.columnIndex="8" GridPane.rowIndex="2" />
-            <VBox maxWidth="-Infinity" prefWidth="80.0" spacing="5.0" GridPane.columnIndex="8" GridPane.rowIndex="3">
-               <children>
-                  <ToggleButton fx:id="dateToggle" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Date">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="selectGroup" />
-                     </toggleGroup>
-                  </ToggleButton>
-                  <ToggleButton fx:id="timeToggle" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Time" toggleGroup="$selectGroup" />
-                  <ToggleButton fx:id="ignoreToggle" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Ignore" toggleGroup="$selectGroup" />
-               </children>
-               <GridPane.margin>
-                  <Insets top="20.0" />
-               </GridPane.margin>
-            </VBox>
-            <PreviewTable fx:id="previewTable" GridPane.columnSpan="8" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+            <PreviewTable fx:id="previewTable" maxWidth="1.7976931348623157E308" minHeight="30.0" GridPane.columnSpan="9" GridPane.rowIndex="2" GridPane.rowSpan="2" />
          </children>
          <GridPane.margin>
             <Insets />

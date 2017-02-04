@@ -41,9 +41,6 @@ public class Controller implements Initializable {
     @FXML private ChoiceBox delimiterChoiceBox;
     @FXML private Spinner periodSpinner;
     @FXML private ChoiceBox periodUnitChoiceBox;
-    @FXML private ToggleButton dateToggle;
-    @FXML private ToggleButton timeToggle;
-    @FXML private ToggleButton ignoreToggle;
     @FXML private Button runButton;
     @FXML private PreviewTable previewTable;
 
@@ -172,9 +169,6 @@ public class Controller implements Initializable {
         delimiterChoiceBox.setDisable(disable);
         periodSpinner.setDisable(disable);
         periodUnitChoiceBox.setDisable(disable);
-        dateToggle.setDisable(disable);
-        timeToggle.setDisable(disable);
-        ignoreToggle.setDisable(disable);
     }
 
     private static final int PREVIEW_RECORD_COUNT = 5;

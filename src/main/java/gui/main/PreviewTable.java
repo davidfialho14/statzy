@@ -2,20 +2,43 @@ package gui.main;
 
 import core.Record;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.control.TableCell;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.GridPane;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  *
  */
-public class PreviewTable extends TableView<Record> {
+public class PreviewTable extends GridPane {
 
+    @FXML private TableView<Record> tableView;
+    @FXML private ToggleButton dateToggle;
+    @FXML private ToggleButton timeToggle;
+    @FXML private ToggleButton ignoreToggle;
+    
     private boolean dataIsSet = false;
     private boolean headersAreSet = false;
+
+    public PreviewTable() {
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxmls/preview_table.fxml"));
+        fxmlLoader.setRoot(this);
+        fxmlLoader.setController(this);
+
+        try {
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
+    }
 
     /**
      * Gives the table column an index that can be used by the cell value factory to to get the correct value
@@ -50,25 +73,25 @@ public class PreviewTable extends TableView<Record> {
 
         if (dataIsSet) {
 
-            if (headers.size() != getColumns().size()) {
+            if (headers.size() != tableView.getColumns().size()) {
                 // clear headers from all columns
-                getColumns().forEach(column -> column.setText(""));
+                tableView.getColumns().forEach(column -> column.setText(""));
 
                 throw new PreviewException("Headers does not correspond to current data file: headers file " +
-                        "has " + headers.size() + " headers and the data file has " + getColumns().size() +
-                        " columns.");
+                        "has " + headers.size() + " headers and the data file has " +
+                        tableView.getColumns().size() + " columns.");
             }
 
             for (int i = 0; i < headers.size(); i++) {
-                getColumns().get(i).setText(headers.get(i));
+                tableView.getColumns().get(i).setText(headers.get(i));
             }
 
         } else {
 
-            getColumns().clear();
+            tableView.getColumns().clear();
 
             for (int i = 0; i < headers.size(); i++) {
-                getColumns().add(new PreviewTableColumn(headers.get(i), i));
+                tableView.getColumns().add(new PreviewTableColumn(headers.get(i), i));
             }
 
         }
@@ -90,32 +113,32 @@ public class PreviewTable extends TableView<Record> {
         // NOTE: clearing just the columns does not clear the item from the table view!
 
         // clear all current data being previewed
-        getItems().clear();
+        tableView.getItems().clear();
 
         if (headersAreSet) {
 
             // ensure the number of columns occupied by the data matches the number of headers
             int recordSize = dataRecords.get(0).size();
-            if (recordSize != getColumns().size()) {
+            if (recordSize != tableView.getColumns().size()) {
                 throw new PreviewException("Data does not correspond to current headers file: data file " +
-                        "has " + recordSize + " columns and the headers file has " + getColumns().size() +
+                        "has " + recordSize + " columns and the headers file has " + tableView.getColumns().size() +
                         " headers.");
             }
 
         } else {
 
-            getColumns().clear();
+            tableView.getColumns().clear();
 
             // create new columns
             int recordSize = dataRecords.get(0).size();
             for (int i = 0; i < recordSize; i++) {
-                getColumns().add(new PreviewTableColumn("", i));
+                tableView.getColumns().add(new PreviewTableColumn("", i));
             }
 
         }
 
         // fill table with data
-        getItems().addAll(dataRecords.stream().collect(Collectors.toList()));
+        tableView.getItems().addAll(dataRecords.stream().collect(Collectors.toList()));
 
         dataIsSet = true;
     }
@@ -127,9 +150,9 @@ public class PreviewTable extends TableView<Record> {
     public void clearHeaders() {
 
         if (dataIsSet) {
-            getColumns().forEach(column -> column.setText(""));
+            tableView.getColumns().forEach(column -> column.setText(""));
         } else {
-            getColumns().clear();
+            tableView.getColumns().clear();
         }
 
         headersAreSet = false;
@@ -142,9 +165,9 @@ public class PreviewTable extends TableView<Record> {
     public void clearData() {
 
         if (headersAreSet) {
-            getItems().clear();
+            tableView.getItems().clear();
         } else {
-            getColumns().clear();
+            tableView.getColumns().clear();
         }
 
         dataIsSet = false;
