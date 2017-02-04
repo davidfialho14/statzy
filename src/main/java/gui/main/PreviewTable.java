@@ -7,41 +7,23 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import org.apache.commons.csv.CSVRecord;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  *
  */
-public class PreviewTable extends TableView<ObservableList<String>> {
+public class PreviewTable extends TableView<Record> {
 
     private boolean dataIsSet = false;
     private boolean headersAreSet = false;
 
     /**
-     *
-     */
-    private static class PreviewCell extends TableCell<ObservableList<String>, String> {
-
-        @Override
-        protected void updateItem(String item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (!isEmpty()) {
-                setText(item);
-            }
-        }
-
-    }
-
-    /**
      * Gives the table column an index that can be used by the cell value factory to to get the correct value
      * from the data model. Adds a context menu to set the column as a date, time or datetime column. Adds a
      */
-    public static class PreviewTableColumn extends TableColumn<ObservableList<String>, String> {
+    public static class PreviewTableColumn extends TableColumn<Record, String> {
 
         public PreviewTableColumn(String header, int index) {
             super();
@@ -57,16 +39,20 @@ public class PreviewTable extends TableView<ObservableList<String>> {
 
     }
 
+    /**
+     * Sets the headers to be previewed. Headers are shown in the same order they are in the list.
+     *
+     * @param headers the headers to be preview.
+     * @throws PreviewException if the number of headers does not correspond to the number of columns of
+     * the data being previewed.
+     */
     public void setHeaders(List<String> headers) throws PreviewException {
 
         if (dataIsSet) {
 
             if (headers.size() != getColumns().size()) {
-
-                for (TableColumn<ObservableList<String>, ?> column : getColumns()) {
-                    column.setText("");
-                }
-
+                // clear headers from all columns
+                getColumns().forEach(column -> column.setText(""));
 
                 throw new PreviewException("Headers does not correspond to current data file: headers file " +
                         "has " + headers.size() + " headers and the data file has " + getColumns().size() +
@@ -84,17 +70,29 @@ public class PreviewTable extends TableView<ObservableList<String>> {
             for (int i = 0; i < headers.size(); i++) {
                 getColumns().add(new PreviewTableColumn(headers.get(i), i));
             }
+
         }
 
         headersAreSet = true;
     }
 
+    /**
+     * Sets the data to be previewed. Data is shown in the same order it is in the list.
+     *
+     * @param dataRecords the data to be preview.
+     * @throws PreviewException if the number of data values in each record does not correspond to the number
+     * of headers being previewed.
+     */
     public void setData(List<Record> dataRecords) throws PreviewException {
+
+        // NOTE: clearing just the columns does not clear the item from the table view!
+
+        // clear all current data being previewed
+        getItems().clear();
 
         if (headersAreSet) {
 
-            getItems().clear();
-
+            // ensure the number of columns occupied by the data matches the number of headers
             int recordSize = dataRecords.get(0).size();
             if (recordSize != getColumns().size()) {
                 throw new PreviewException("Data does not correspond to current headers file: data file " +
@@ -102,34 +100,32 @@ public class PreviewTable extends TableView<ObservableList<String>> {
                         " headers.");
             }
 
-            getItems().addAll(dataRecords.stream()
-                    .map(dataRecord -> FXCollections.observableArrayList(dataRecord.toCollection()))
-                    .collect(Collectors.toList()));
         } else {
 
             getColumns().clear();
 
+            // create new columns
             int recordSize = dataRecords.get(0).size();
             for (int i = 0; i < recordSize; i++) {
                 getColumns().add(new PreviewTableColumn("", i));
             }
 
-            getItems().addAll(dataRecords.stream()
-                    .map(dataRecord -> FXCollections.observableArrayList(dataRecord.toCollection()))
-                    .collect(Collectors.toList()));
         }
+
+        // fill table with data
+        getItems().addAll(dataRecords.stream().collect(Collectors.toList()));
 
         dataIsSet = true;
     }
 
+    /**
+     * Clears the headers from the preview table. If preview data is set then the column headers are
+     * cleared but the data preview is kept. If no preview data is set then all columns cleared.
+     */
     public void clearHeaders() {
 
         if (dataIsSet) {
-
-            for (TableColumn<ObservableList<String>, ?> column : getColumns()) {
-                column.setText("");
-            }
-
+            getColumns().forEach(column -> column.setText(""));
         } else {
             getColumns().clear();
         }
@@ -137,6 +133,10 @@ public class PreviewTable extends TableView<ObservableList<String>> {
         headersAreSet = false;
     }
 
+    /**
+     * Clears the data from the preview table. If preview headers are set then all data is cleared from the
+     * columns but the headers are kept. If no preview headers are set then all columns cleared.
+     */
     public void clearData() {
 
         if (headersAreSet) {

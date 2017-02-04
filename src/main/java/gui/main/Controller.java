@@ -177,7 +177,7 @@ public class Controller implements Initializable {
         ignoreToggle.setDisable(disable);
     }
 
-    private static final int PREVIEW_RECORD_COUNT = 10;
+    private static final int PREVIEW_RECORD_COUNT = 5;
 
     private void previewData() {
 
@@ -196,10 +196,7 @@ public class Controller implements Initializable {
 
         } catch (IOException | IllegalRecordSizeException | PreviewException e) {
             dataFileTextField.setInvalid();
-
-            Alert alert = new Alert(Alert.AlertType.ERROR, WordUtils.wrap(e.getMessage(), 50), ButtonType.OK);
-            alert.setHeaderText("Data Preview Error");
-            alert.showAndWait();
+            errorAlert(e.getMessage(), "Data Preview Error").showAndWait();
         }
     }
 
@@ -211,11 +208,15 @@ public class Controller implements Initializable {
 
         } catch (IOException | ParseException | PreviewException e) {
             headersFileTextField.setInvalid();
-            Alert alert = new Alert(Alert.AlertType.ERROR, WordUtils.wrap(e.getMessage(), 50), ButtonType.OK);
-            alert.setHeaderText("Header Preview Error");
-            alert.showAndWait();
+            errorAlert(e.getMessage(), "Headers Preview Error").showAndWait();
         }
 
+    }
+
+    private static Alert errorAlert(String message, String header) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, WordUtils.wrap(message, 50), ButtonType.OK);
+        alert.setHeaderText(header);
+        return alert;
     }
 
 }
