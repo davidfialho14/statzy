@@ -13,3 +13,5 @@ hs_err_pid*
 
 .idea/
 statzy.iml
+examples/
+target/
