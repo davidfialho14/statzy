@@ -96,27 +96,18 @@ public class Controller implements Initializable {
             runButton.setDisable(!(isValid && dataFileTextField.isValid() && headersFileTextField.isValid()));
         });
 
-        // load headers file when it is labeled as valid
-        headersFileTextField.pathProperty().addListener((observable, oldPath, newPath) -> {
-
-            if (headersFileTextField.isValid()) {
-                previewHeaders();
-            } else {
+        headersFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
+            if (wasValid && !isValid) { // became invalid
                 previewTable.clearHeaders();
             }
-
         });
 
-        // load data file when it is labeled as valid
-        dataFileTextField.pathProperty().addListener((observable, oldPath, newPath) -> {
-
-            if (dataFileTextField.isValid()) {
-                previewData();
-            } else {
+        dataFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
+            if (wasValid && !isValid) { // became invalid
                 previewTable.clearData();
             }
-
         });
+
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -126,19 +117,33 @@ public class Controller implements Initializable {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     public void chooseDataFile(ActionEvent actionEvent) {
-        chooseInputFile(dataFileTextField);
+        File chosenFile = chooseInputFile(dataFileTextField);
+
+        if (chosenFile != null) {
+            if (dataFileTextField.isValid()) {
+                previewData();
+            } else {
+                previewTable.clearData();
+            }
+        }
     }
 
     public void chooseHeadersFile(ActionEvent actionEvent) {
-        chooseInputFile(headersFileTextField);
+        File chosenFile = chooseInputFile(headersFileTextField);
+
+        if (chosenFile != null && headersFileTextField.isValid()) {
+            previewHeaders();
+        }
     }
 
-    private void chooseInputFile(InputFileTextField fileTextField) {
+    private File chooseInputFile(InputFileTextField fileTextField) {
         File file = fileChooser.showOpenDialog(mainPain.getScene().getWindow());
 
         if (file != null) {
             fileTextField.setFile(file);
         }
+
+        return file;
     }
 
     public void chooseOutputPath(ActionEvent actionEvent) {

@@ -2,6 +2,7 @@ package gui.main;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,6 +33,7 @@ public abstract class FileTextField extends HBox implements Initializable {
 
     private File file = new File("");
     private BooleanProperty isValid = new SimpleBooleanProperty(false);
+    private StringProperty pathProperty = new SimpleStringProperty(file.getPath());
 
     public FileTextField() {
 
@@ -56,7 +58,7 @@ public abstract class FileTextField extends HBox implements Initializable {
     }
 
     public StringProperty pathProperty() {
-        return textField.textProperty();
+        return pathProperty;
     }
 
     public void updateImage() {
