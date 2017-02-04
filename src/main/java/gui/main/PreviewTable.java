@@ -3,6 +3,7 @@ package gui.main;
 import com.sun.javafx.collections.ObservableSetWrapper;
 import core.Record;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableSet;
@@ -18,6 +19,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -234,6 +236,30 @@ public class PreviewTable extends GridPane implements Initializable {
      *  Public Interface
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    public int getDateColumn() {
+        return dateColumn.get();
+    }
+
+    public int getTimeColumn() {
+        return timeColumn.get();
+    }
+
+    public Set<Integer> getIgnoredColumns() {
+        return ignoredColumns;
+    }
+
+    public IntegerProperty dateColumnProperty() {
+        return dateColumn;
+    }
+
+    public IntegerProperty timeColumnProperty() {
+        return timeColumn;
+    }
+
+    public ObservableSet<Integer> ignoredColumnsProperty() {
+        return ignoredColumns;
+    }
 
     /**
      * Sets the headers to be previewed. Headers are shown in the same order they are in the list.

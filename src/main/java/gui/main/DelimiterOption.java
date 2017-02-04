@@ -20,6 +20,10 @@ public enum DelimiterOption {
         this.delimiter = delimiter;
     }
 
+    public Delimiter getDelimiter() {
+        return delimiter;
+    }
+
     @Override
     public String toString() {
         return delimiter.getName();

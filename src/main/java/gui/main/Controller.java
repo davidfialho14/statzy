@@ -1,6 +1,7 @@
 package gui.main;
 
 import core.*;
+import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -172,6 +173,56 @@ public class Controller implements Initializable {
         if (file != null) {
             outputFileTextField.setFile(file);
         }
+    }
+
+    public void run(ActionEvent actionEvent) {
+
+        Headers headers;
+        try (HeadersReader headersReader = new HeadersReader(headersFileTextField.getFile(),
+                previewTable.getDateColumn(), previewTable.getTimeColumn(),
+                previewTable.getIgnoredColumns())) {
+
+            headers = headersReader.read();
+
+        } catch (IOException e) {
+            errorAlert(e.getMessage(), "Headers File Error").showAndWait();
+            return;
+        } catch (ParseException e) {
+            errorAlert("Headers file probably has an error in line " + e.getErrorOffset() + ".\n" +
+                    e.getMessage(), "Process Error").showAndWait();
+            return;
+        }
+
+        try (
+                DataRecordReader reader = DataRecordReader.with(dataFileTextField.getFile())
+                        .withDateInColumn(previewTable.getDateColumn())
+                        .withDatePattern(dateFormatChoiceBox.getValue())
+                        .withTimeInColumn(previewTable.getTimeColumn())
+                        .withTimePattern(timeFormatChoiceBox.getValue())
+                        .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
+                        .ignoreColumns(previewTable.getIgnoredColumns())
+                        .build();
+
+                DataFileWriter writer = DataFileWriter.outputTo(outputFileTextField.getFile())
+                        .withHeaders(headers)
+                        .withDatePattern(dateFormatChoiceBox.getValue())
+                        .withTimePattern(timeFormatChoiceBox.getValue())
+                        .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
+                        .inSameColumn(previewTable.getDateColumn() == previewTable.getTimeColumn())
+                        .build()
+        ) {
+
+            StatisticsGenerator statisticsGenerator = new StatisticsGenerator();
+            statisticsGenerator.process(reader, writer, Period.of(periodSpinner.getValue(),
+                    periodUnitChoiceBox.getValue()));
+
+        } catch (IOException e) {
+            errorAlert(e.getMessage(), "Process Error").showAndWait();
+        } catch (ParseException e) {
+            errorAlert("Data file probably has an error in line " + e.getErrorOffset() + ".\n" +
+                            e.getMessage(), "Process Error").showAndWait();
+        }
+
     }
 
     /**
