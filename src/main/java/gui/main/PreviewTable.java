@@ -3,7 +3,6 @@ package gui.main;
 import com.sun.javafx.collections.ObservableSetWrapper;
 import core.Record;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableSet;

@@ -75,6 +75,12 @@ public abstract class FileTextField extends HBox implements Initializable {
         textField.setText(file.getPath());
     }
 
+    public void clear() {
+        this.file = new File("");
+        isValid.setValue(false);
+        textField.setText("");
+    }
+
     public boolean isValid() {
         return isValid.getValue();
     }
