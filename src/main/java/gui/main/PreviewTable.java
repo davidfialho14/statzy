@@ -10,8 +10,10 @@ import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.TextAlignment;
 
 import java.io.IOException;
 import java.net.URL;
@@ -82,7 +84,9 @@ public class PreviewTable extends GridPane implements Initializable {
         private final PreviewTableColumn column;
 
         private PreviewTableCell(PreviewTableColumn column) {
+            super();
             this.column = column;
+            setAlignment(Pos.CENTER);
         }
 
         @Override
