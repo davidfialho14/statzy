@@ -62,6 +62,9 @@ public class PreviewTable extends GridPane implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        // disable selection
+        tableView.setSelectionModel(null);
+
         // Ensure the selected columns are updated every time a new date/time/ignore column is selected
         dateColumn.addListener((observable, oldValue, newValue) -> tableView.refresh());
         timeColumn.addListener((observable, oldValue, newValue) -> tableView.refresh());
