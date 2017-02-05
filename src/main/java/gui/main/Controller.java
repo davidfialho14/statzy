@@ -1,15 +1,16 @@
 package gui.main;
 
 import core.*;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.File;
@@ -56,6 +57,8 @@ public class Controller implements Initializable {
     private static final String[] TIME_FORMATS = {
             "HH:mm:ss", "HHmmss", "HH:mm"
     };
+
+    private static final String HEADERS_TAG = "headers";
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -129,6 +132,88 @@ public class Controller implements Initializable {
         periodSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
 
+        // setup required conditions to accept files by drag and drop
+        previewTable.setOnDragOver(event -> {
+
+            // The preview table accepts dropping 1 or 2 files
+            // If only 1 file is being dropped, then it accepts any files
+            // If 2 files are dropped, then it requires that one of them is an headers file and the other a
+            // data file
+
+            List<File> droppedFiles = event.getDragboard().getFiles();
+            if (droppedFiles != null) {
+                if (droppedFiles.size() == 1
+                        || (droppedFiles.size() == 2
+                            && (isHeadersFile(event.getDragboard().getFiles().get(0))
+                                ^ isHeadersFile(event.getDragboard().getFiles().get(1))))) {
+
+                    event.acceptTransferModes(TransferMode.ANY);
+                    event.consume();
+                }
+
+            }
+
+        });
+
+        // process the dropped file(s)
+        previewTable.setOnDragDropped(event -> {
+
+            List<File> droppedFiles = event.getDragboard().getFiles();
+            File droppedFile = event.getDragboard().getFiles().get(0);
+
+            if (droppedFiles.size() == 2) {
+                // an headers and data file were dropped
+                File secondDroppedFile = event.getDragboard().getFiles().get(1);
+
+                File headersFile, dataFile;
+                if (isHeadersFile(droppedFile)) {
+                    headersFile = droppedFile;
+                    dataFile = secondDroppedFile;
+                } else {
+                    headersFile = secondDroppedFile;
+                    dataFile = droppedFile;
+                }
+
+                // must ensure that the previous headers and data file are cleared before setting new
+                // headers and data files - this avoids conflicts with the previous files
+                headersFileTextField.clear();
+                dataFileTextField.clear();
+
+                headersFileTextField.setFile(headersFile);
+                previewHeaders();
+                dataFileTextField.setFile(dataFile);
+                previewData();
+
+            } else {
+                // only one file was dropped - it may be an headers or data file
+
+                if (isHeadersFile(droppedFile)) {
+                    headersFileTextField.setFile(droppedFile);
+                    previewHeaders();
+                } else{
+                    dataFileTextField.setFile(droppedFile);
+                    previewData();
+                }
+
+            }
+
+            event.setDropCompleted(true);
+            event.consume();
+
+        });
+
+    }
+
+    /**
+     * Checks if a file corresponds to an headers file. A file is considered an headers file if its name
+     * (excluding the extension) ends with the headers tag.
+     *
+     * @param file the file to check, not null.
+     * @return true is the file is an headers file, and false if otherwise.
+     */
+    private static boolean isHeadersFile(File file) {
+        String filename = FilenameUtils.getBaseName(file.getName());
+        return filename.toLowerCase().endsWith(HEADERS_TAG);
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
