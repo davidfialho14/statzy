@@ -1,6 +1,8 @@
 package gui.main;
 
 import javafx.beans.property.StringProperty;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,6 +17,8 @@ public class ProgressDialogController extends GridPane {
     @FXML private Button cancelButton;
     @FXML private Button saveButton;
     @FXML private ProgressBar progressBar;
+
+    private EventHandler<Event> saveEventHandler;
 
     /**
      * Adjusts the progress dialog to indicate to the user the processing is complete.
@@ -44,7 +48,12 @@ public class ProgressDialogController extends GridPane {
     }
 
     public void save() {
+        saveEventHandler.handle(new Event(Event.ANY));
         close();
+    }
+
+    public void setOnSaveClicked(EventHandler<Event> eventHandler) {
+        saveEventHandler = eventHandler;
     }
 
     /**

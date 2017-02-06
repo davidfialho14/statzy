@@ -1,8 +1,8 @@
 package gui.main;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -63,5 +63,9 @@ public class ProgressDialog extends Stage {
 
     public void setMessage(String message) {
         controller.messageProperty().setValue(message);
+    }
+
+    public void setOnSaveClicked(EventHandler<Event> eventHandler) {
+        controller.setOnSaveClicked(eventHandler);
     }
 }

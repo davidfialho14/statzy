@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Task to perform the statistics processing. It is based on a statistics generator.
  */
-public class StatisticsTask extends Task<Void> implements ProgressListener {
+public class StatisticsTask extends Task<Integer> implements ProgressListener {
 
     private static final StatisticsGenerator statisticsGenerator = new StatisticsGenerator();
     private static final TimestampFormatter formatter = TimestampFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
@@ -40,22 +40,11 @@ public class StatisticsTask extends Task<Void> implements ProgressListener {
     }
 
     @Override
-    public Void call() {
+    public Integer call() throws IOException, ParseException {
 
         Headers headers;
         try (HeadersReader headersReader = new HeadersReader(headersFile, dateColumn, timeColumn, ignoredColumns)) {
             headers = headersReader.read();
-
-        } catch (IOException e) {
-            errorAlert(e.getMessage(), "I/O File Error").showAndWait();
-            failed();
-            return null;
-
-        } catch (ParseException e) {
-            errorAlert("Headers file probably has an error in line " + e.getErrorOffset() + ".\n" +
-                    e.getMessage(), "Process Error").showAndWait();
-            failed();
-            return null;
         }
 
         try (
@@ -66,14 +55,6 @@ public class StatisticsTask extends Task<Void> implements ProgressListener {
             statisticsGenerator.process(reader, writer, period);
             statisticsGenerator.removeListener(this);
 
-        } catch (IOException e) {
-            errorAlert(e.getMessage(), "I/O Error").showAndWait();
-            failed();
-
-        } catch (ParseException e) {
-            errorAlert("Data file probably has an error in line " + e.getErrorOffset() + ".\n" +
-                    e.getMessage(), "Process Error").showAndWait();
-            failed();
         }
 
         return null;
@@ -92,12 +73,6 @@ public class StatisticsTask extends Task<Void> implements ProgressListener {
     public void notifyProcessingPeriod(Timestamp lowerBound, Timestamp upperBound) {
         updateMessage("Period between " + formatter.format(lowerBound) + " and " +
                 formatter.format(upperBound));
-    }
-
-    private static Alert errorAlert(String message, String header) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, WordUtils.wrap(message, 50), ButtonType.OK);
-        alert.setHeaderText(header);
-        return alert;
     }
 
 }
