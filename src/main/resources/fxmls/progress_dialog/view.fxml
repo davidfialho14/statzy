@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<fx:root hgap="15.0" maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" type="GridPane" vgap="15.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root hgap="15.0" maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" type="GridPane" vgap="15.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.valignment="TOP">
       <image>
@@ -27,47 +27,23 @@
             <Font name="System Bold" size="13.0" />
           </font>
         </Label>
-            <HBox>
-               <children>
-              <Label fx:id="betweenLabel" text="Period between " wrapText="true">
-                <font>
-                  <Font size="12.0" />
-                </font>
-              </Label>
-                  <Label fx:id="lowerBoundLabel" wrapText="true">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="andLabel" text=" and " wrapText="true">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="upperBoundLabel" wrapText="true">
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Label>
-               </children>
-            </HBox>
+        <Label fx:id="messageLabel" text="message" wrapText="true">
+          <font>
+            <Font size="12.0" />
+          </font>
+        </Label>
       </children>
     </VBox>
     <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2">
       <children>
-        <Button fx:id="cancelButton" cancelButton="true" minWidth="80.0" mnemonicParsing="false" onAction="#cancel" text="Cancel" HBox.hgrow="NEVER">
-          <HBox.margin>
-            <Insets />
-          </HBox.margin>
-        </Button>
-      <Button fx:id="saveButton" disable="true" minWidth="80.0" mnemonicParsing="false" onAction="#save" text="Save" HBox.hgrow="NEVER">
+      <Button fx:id="confirmButton" disable="true" minWidth="80.0" mnemonicParsing="false" onAction="#confirm" text="Ok" HBox.hgrow="NEVER">
         <HBox.margin>
           <Insets left="15.0" />
         </HBox.margin>
       </Button>
       </children>
     </HBox>
-      <ProgressBar maxWidth="1.7976931348623157E308" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
   </children>
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />

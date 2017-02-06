@@ -1,5 +1,8 @@
 package gui.main;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -11,10 +14,12 @@ import java.io.IOException;
  */
 public class ProgressDialog extends Stage {
 
+    private final ProgressDialogController controller;
+
     public ProgressDialog() {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxmls/progress_dialog/view.fxml"));
-        ProgressDialogController controller = new ProgressDialogController();
+        controller = new ProgressDialogController();
         fxmlLoader.setController(controller);
         fxmlLoader.setRoot(controller);
 
@@ -27,4 +32,31 @@ public class ProgressDialog extends Stage {
 
     }
 
+    /**
+     * Returns the property corresponding to the progress message being shown to the user.
+     *
+     * @return the property corresponding to the progress message being shown to the user.
+     */
+    public StringProperty messageProperty() {
+        return controller.messageProperty();
+    }
+
+    /**
+     * Adjusts the progress dialog to indicate to the user the processing is complete.
+     */
+    public void onFinished() {
+        controller.onFinished();
+    }
+
+    /**
+     * Adjusts the progress dialog in case of processing fails. By default just closes the dialog.
+     */
+    public void onFailed() {
+        controller.onFailed();
+    }
+
+
+    public void setMessage(String message) {
+        controller.messageProperty().setValue(message);
+    }
 }

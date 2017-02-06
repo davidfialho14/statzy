@@ -16,9 +16,4 @@ public interface ProgressListener {
      */
     void notifyProcessingPeriod(Timestamp lowerBound, Timestamp upperBound);
 
-    /**
-     * Notifies the listener that the processing has finished.
-     */
-    void notifyFinished();
-
 }

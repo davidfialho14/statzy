@@ -59,7 +59,6 @@ public class StatisticsGenerator {
                     groupStatistics.getStandardDeviations());
         }
 
-        notifyFinished();
     }
 
     /**
@@ -82,10 +81,6 @@ public class StatisticsGenerator {
 
     private void notifyProcessingPeriod(Timestamp lowerBound, Timestamp upperBound) {
         listeners.forEach(listener -> listener.notifyProcessingPeriod(lowerBound, upperBound));
-    }
-
-    private void notifyFinished() {
-        listeners.forEach(ProgressListener::notifyFinished);
     }
 
 }

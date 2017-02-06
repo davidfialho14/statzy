@@ -260,54 +260,39 @@ public class Controller implements Initializable {
         }
     }
 
-    public void run(ActionEvent actionEvent) {
+    public void run(ActionEvent actionEvent) throws IOException {
 
-        Headers headers;
-        try (HeadersReader headersReader = new HeadersReader(headersFileTextField.getFile(),
-                previewTable.getDateColumn(), previewTable.getTimeColumn(),
-                previewTable.getIgnoredColumns())) {
+        DataRecordReader.Builder readerBuilder = DataRecordReader.with(dataFileTextField.getFile())
+                .withDateInColumn(previewTable.getDateColumn())
+                .withDatePattern(dateFormatChoiceBox.getValue())
+                .withTimeInColumn(previewTable.getTimeColumn())
+                .withTimePattern(timeFormatChoiceBox.getValue())
+                .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
+                .ignoreColumns(previewTable.getIgnoredColumns());
 
-            headers = headersReader.read();
+        DataFileWriter.Builder writerBuilder = DataFileWriter.outputTo(outputFileTextField.getFile())
+                .withDatePattern(dateFormatChoiceBox.getValue())
+                .withTimePattern(timeFormatChoiceBox.getValue())
+                .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
+                .inSameColumn(previewTable.getDateColumn() == previewTable.getTimeColumn());
 
-        } catch (IOException e) {
-            errorAlert(e.getMessage(), "Headers File Error").showAndWait();
-            return;
-        } catch (ParseException e) {
-            errorAlert("Headers file probably has an error in line " + e.getErrorOffset() + ".\n" +
-                    e.getMessage(), "Process Error").showAndWait();
-            return;
-        }
+        StatisticsTask task = new StatisticsTask(
+                headersFileTextField.getFile(), previewTable.getDateColumn(), previewTable.getTimeColumn(),
+                previewTable.getIgnoredColumns(), readerBuilder, writerBuilder,
+                Period.of(periodSpinner.getValue(), periodUnitChoiceBox.getValue()));
 
-        try (
-                DataRecordReader reader = DataRecordReader.with(dataFileTextField.getFile())
-                        .withDateInColumn(previewTable.getDateColumn())
-                        .withDatePattern(dateFormatChoiceBox.getValue())
-                        .withTimeInColumn(previewTable.getTimeColumn())
-                        .withTimePattern(timeFormatChoiceBox.getValue())
-                        .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
-                        .ignoreColumns(previewTable.getIgnoredColumns())
-                        .build();
+        ProgressDialog progressDialog = new ProgressDialog();
+        progressDialog.messageProperty().bind(task.messageProperty());
+        task.setOnSucceeded(event -> {
+            progressDialog.onFinished();
+            progressDialog.setMessage("Save to '" + outputFileTextField.getFile().getName() + "'");
+        });
+        task.setOnFailed(event -> progressDialog.onFailed());
 
-                DataFileWriter writer = DataFileWriter.outputTo(outputFileTextField.getFile())
-                        .withHeaders(headers)
-                        .withDatePattern(dateFormatChoiceBox.getValue())
-                        .withTimePattern(timeFormatChoiceBox.getValue())
-                        .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
-                        .inSameColumn(previewTable.getDateColumn() == previewTable.getTimeColumn())
-                        .build()
-        ) {
+        // start the task in the background
+        new Thread(task).start();
 
-            StatisticsGenerator statisticsGenerator = new StatisticsGenerator();
-            statisticsGenerator.process(reader, writer, Period.of(periodSpinner.getValue(),
-                    periodUnitChoiceBox.getValue()));
-
-        } catch (IOException e) {
-            errorAlert(e.getMessage(), "Process Error").showAndWait();
-        } catch (ParseException e) {
-            errorAlert("Data file probably has an error in line " + e.getErrorOffset() + ".\n" +
-                            e.getMessage(), "Process Error").showAndWait();
-        }
-
+        progressDialog.showAndWait();
     }
 
     /**
