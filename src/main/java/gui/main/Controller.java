@@ -281,7 +281,7 @@ public class Controller implements Initializable {
                 previewTable.getIgnoredColumns(), readerBuilder, writerBuilder,
                 Period.of(periodSpinner.getValue(), periodUnitChoiceBox.getValue()));
 
-        ProgressDialog progressDialog = new ProgressDialog();
+        ProgressDialog progressDialog = new ProgressDialog(mainPain.getScene().getWindow());
         progressDialog.messageProperty().bind(task.messageProperty());
         task.setOnSucceeded(event -> {
             progressDialog.onFinished();

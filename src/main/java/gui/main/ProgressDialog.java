@@ -5,7 +5,9 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.IOException;
 
@@ -16,12 +18,15 @@ public class ProgressDialog extends Stage {
 
     private final ProgressDialogController controller;
 
-    public ProgressDialog() {
+    public ProgressDialog(Window owner) {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxmls/progress_dialog/view.fxml"));
         controller = new ProgressDialogController();
         fxmlLoader.setController(controller);
         fxmlLoader.setRoot(controller);
+
+        initModality(Modality.APPLICATION_MODAL);
+        initOwner(owner);
 
         try {
             setScene(new Scene(fxmlLoader.load()));
