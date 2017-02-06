@@ -145,8 +145,8 @@ public class Controller implements Initializable {
             if (droppedFiles != null) {
                 if (droppedFiles.size() == 1
                         || (droppedFiles.size() == 2
-                            && (isHeadersFile(event.getDragboard().getFiles().get(0))
-                                ^ isHeadersFile(event.getDragboard().getFiles().get(1))))) {
+                            && (isHeadersFile(droppedFiles.get(0))
+                                ^ isHeadersFile(droppedFiles.get(1))))) {
 
                     event.acceptTransferModes(TransferMode.ANY);
                     event.consume();
