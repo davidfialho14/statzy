@@ -2,18 +2,18 @@ package gui.main;
 
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import java.io.File;
 
 public class ProgressDialogController extends GridPane {
 
     @FXML private Label statusLabel;
     @FXML private Label messageLabel;
     @FXML private Button cancelButton;
-    @FXML private Button confirmButton;
+    @FXML private Button saveButton;
     @FXML private ProgressBar progressBar;
 
     /**
@@ -23,7 +23,7 @@ public class ProgressDialogController extends GridPane {
         statusLabel.setText("Done");
         messageLabel.textProperty().unbind();
         messageLabel.setText("");
-        confirmButton.setDisable(false);
+        saveButton.setDisable(false);
         progressBar.setProgress(1);
     }
 
@@ -43,7 +43,7 @@ public class ProgressDialogController extends GridPane {
         return messageLabel.textProperty();
     }
 
-    public void confirm() {
+    public void save() {
         close();
     }
 

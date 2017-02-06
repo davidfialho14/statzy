@@ -16,10 +16,15 @@ import org.apache.commons.lang3.text.WordUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Controller implements Initializable {
 
@@ -47,6 +52,8 @@ public class Controller implements Initializable {
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    private static final String TEMP_FILE_NAME = "output";
+    private File tempOutputFile = new File(TEMP_FILE_NAME);
     private final FileChooser fileChooser = new FileChooser();
 
     private static final String[] DATE_FORMATS = {
@@ -262,6 +269,8 @@ public class Controller implements Initializable {
 
     public void run(ActionEvent actionEvent) throws IOException {
 
+        tempOutputFile = File.createTempFile(TEMP_FILE_NAME, null);
+
         DataRecordReader.Builder readerBuilder = DataRecordReader.with(dataFileTextField.getFile())
                 .withDateInColumn(previewTable.getDateColumn())
                 .withDatePattern(dateFormatChoiceBox.getValue())
@@ -270,7 +279,7 @@ public class Controller implements Initializable {
                 .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
                 .ignoreColumns(previewTable.getIgnoredColumns());
 
-        DataFileWriter.Builder writerBuilder = DataFileWriter.outputTo(outputFileTextField.getFile())
+        DataFileWriter.Builder writerBuilder = DataFileWriter.outputTo(tempOutputFile)
                 .withDatePattern(dateFormatChoiceBox.getValue())
                 .withTimePattern(timeFormatChoiceBox.getValue())
                 .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
@@ -291,6 +300,15 @@ public class Controller implements Initializable {
 
         // start the task in the background
         new Thread(task).start();
+
+        // prompt the user with a save dialog when the progress dialog is closed
+        progressDialog.setOnHidden(event -> {
+            try {
+                save();
+            } catch (IOException e) {
+                errorAlert("Failed to save file: " + e.getMessage(), "Save Error");
+            }
+        });
 
         progressDialog.showAndWait();
     }
@@ -359,4 +377,17 @@ public class Controller implements Initializable {
         return alert;
     }
 
+    /**
+     * Presents the user with a save dialog to select the file where to store the output file. Once the
+     * user selects the output file then it moves the temporary file into the new path.
+     *
+     * @throws IOException if an I/O error occurs.
+     */
+    public void save() throws IOException {
+        File saveFile = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
+
+        if (saveFile != null) {
+            Files.move(tempOutputFile.toPath(), saveFile.toPath(), REPLACE_EXISTING);
+        }
+    }
 }
