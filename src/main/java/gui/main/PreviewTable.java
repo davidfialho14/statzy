@@ -191,6 +191,8 @@ public class PreviewTable extends GridPane implements Initializable {
 
             // use PreviewTableCells instead of the default TableCells
             setCellFactory(param -> new PreviewTableCell(this));
+
+            setMinWidth(100);
         }
 
         public void setHeader(String header) {
