@@ -50,7 +50,7 @@ public class Controller implements Initializable {
 
     private static final String TEMP_FILE_NAME = "output";
     private File tempOutputFile = new File(TEMP_FILE_NAME);
-    private final FileChooser fileChooser = new FileChooser();
+    private final CachedFileChooser fileChooser = new CachedFileChooser();
 
     private static final String[] DATE_FORMATS = {
             "dd/MM/uuuu", "dd/MMM/uu", "dd/MMM/uuuu", "dd/MM/uu",
