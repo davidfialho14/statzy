@@ -11,14 +11,11 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +50,7 @@ public class Controller implements Initializable {
 
     private static final String TEMP_FILE_NAME = "output";
     private File tempOutputFile = new File(TEMP_FILE_NAME);
-    private final FileChooser fileChooser = new FileChooser();
+    private final CachedFileChooser fileChooser = new CachedFileChooser();
 
     private static final String[] DATE_FORMATS = {
             "dd/MM/uuuu", "dd/MMM/uu", "dd/MMM/uuuu", "dd/MM/uu",
@@ -278,23 +275,37 @@ public class Controller implements Initializable {
 
         ProgressDialog progressDialog = new ProgressDialog(mainPain.getScene().getWindow());
         progressDialog.messageProperty().bind(task.messageProperty());
+
         task.setOnSucceeded(event -> {
             progressDialog.onFinished();
             progressDialog.setMessage("Press 'save' to select where to save the result.");
         });
-        task.setOnFailed(event -> progressDialog.onFailed());
+
+        task.setOnFailed(event -> {
+
+            try {
+                throw task.getException();
+
+            } catch (IOException e) {
+                errorAlert(e.getMessage(), "I/O Error").showAndWait();
+
+            } catch (ParseException e) {
+                errorAlert("Data file probably has an error in line " + e.getErrorOffset() + ". " +
+                        e.getMessage(), "Process Error").showAndWait();
+
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                errorAlert("Please contact the developer", "Unknown Error").showAndWait();
+            }
+
+            progressDialog.onFailed();
+
+        });
+
+        progressDialog.setOnSaveClicked(event -> save());
 
         // start the task in the background
         new Thread(task).start();
-
-        // prompt the user with a save dialog when the progress dialog is closed
-        progressDialog.setOnHidden(event -> {
-            try {
-                save();
-            } catch (IOException e) {
-                errorAlert("Failed to save file: " + e.getMessage(), "Save Error");
-            }
-        });
 
         progressDialog.showAndWait();
     }
@@ -338,9 +349,13 @@ public class Controller implements Initializable {
 
             previewTable.setData(previewRecords);
 
-        } catch (IOException | IllegalRecordSizeException | PreviewException e) {
+        } catch (IOException | PreviewException e) {
             dataFileTextField.setInvalid();
             errorAlert(e.getMessage(), "Data Preview Error").showAndWait();
+
+        } catch (IllegalRecordSizeException e) {
+            errorAlert("Data file probably has an error in line " + e.getErrorOffset() + ". " +
+                    e.getMessage(), "Data Preview Error").showAndWait();
         }
     }
 
@@ -350,30 +365,42 @@ public class Controller implements Initializable {
             List<String> headers = parser.parse();
             previewTable.setHeaders(headers);
 
-        } catch (IOException | ParseException | PreviewException e) {
+        } catch (IOException | PreviewException e) {
             headersFileTextField.setInvalid();
             errorAlert(e.getMessage(), "Headers Preview Error").showAndWait();
+
+        } catch (ParseException e) {
+            errorAlert("Headers file probably has an error in line " + e.getErrorOffset() + ". " +
+                    e.getMessage(), "Headers Preview Error").showAndWait();
         }
 
     }
 
     private static Alert errorAlert(String message, String header) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, WordUtils.wrap(message, 50), ButtonType.OK);
+        Alert alert = new Alert(Alert.AlertType.ERROR, message.replace(". ", ".\n"), ButtonType.OK);
         alert.setHeaderText(header);
+        alert.getDialogPane().setPrefWidth(550);
+        alert.setResizable(true);
         return alert;
     }
 
     /**
      * Presents the user with a save dialog to select the file where to store the output file. Once the
      * user selects the output file then it moves the temporary file into the new path.
-     *
-     * @throws IOException if an I/O error occurs.
      */
-    public void save() throws IOException {
+    public void save() {
         File saveFile = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
 
         if (saveFile != null) {
-            Files.move(tempOutputFile.toPath(), saveFile.toPath(), REPLACE_EXISTING);
+
+            try {
+                Files.move(tempOutputFile.toPath(), saveFile.toPath(), REPLACE_EXISTING);
+
+            } catch (IOException e) {
+                errorAlert("Failed to save file to '" + saveFile.getPath() + "'" , "Save Error")
+                        .showAndWait();
+            }
+
         }
     }
 }

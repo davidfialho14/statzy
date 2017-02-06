@@ -72,8 +72,7 @@ public class DataRecordReaderTest {
                 .build();
 
         catcher.expect(ParseException.class);
-        catcher.expectMessage("Record has less values than expected: it is required to have at least 3 " +
-                "values, but has only 2.");
+        catcher.expectMessage("Row is required to have at least 3 columns, but only has 2.");
         recordReader.read();
     }
 
@@ -90,8 +89,7 @@ public class DataRecordReaderTest {
                 .build();
 
         catcher.expect(ParseException.class);
-        catcher.expectMessage("Record has less values than expected: it is required to have at least 11 " +
-                "values, but has only 2.");
+        catcher.expectMessage("Row is required to have at least 11 columns, but only has 2.");
         recordReader.read();
     }
 
@@ -114,7 +112,7 @@ public class DataRecordReaderTest {
 
     @Test
     public void
-    read_RecordWithInvalidDate_ThrowsDateTimeParseException() throws Exception {
+    read_RecordWithInvalidDate_ThrowsParseException() throws Exception {
         RecordParser parserStub = fakeParser(
                 record("09-08-2016", "11:22:01", "176"));
 
@@ -125,7 +123,7 @@ public class DataRecordReaderTest {
                 .withTimePattern("HH:mm:ss")
                 .build();
 
-        catcher.expect(DateTimeParseException.class);
+        catcher.expect(ParseException.class);
         recordReader.read();
     }
 

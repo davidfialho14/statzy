@@ -71,8 +71,8 @@ public class RecordParser implements Closeable {
 
             } else if (csvRecord.size() != expectedColumnCount) {
                 // this record has different number of columns than expected
-                throw new IllegalRecordSizeException("Record has " + csvRecord.size() + " values, but " +
-                        expectedColumnCount + " values were expected.", (int) csvRecord.getRecordNumber(),
+                throw new IllegalRecordSizeException("Row has " + csvRecord.size() + " columns, but " +
+                        expectedColumnCount + " were expected.", (int) csvRecord.getRecordNumber(),
                         expectedColumnCount, csvRecord.size());
             }
 

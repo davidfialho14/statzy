@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
@@ -50,8 +51,8 @@ public class DataRecordReader implements Closeable {
         // check if the record contains enough values - see documentation for the getMinimumRecordSize()
         int minimumRecordSize = getMinimumRecordSize();
         if (record.size() < minimumRecordSize) {
-            throw new ParseException("Record has less values than expected: it is required to have " +
-                    "at least " + minimumRecordSize + " values, but has only " + record.size() + ".",
+            throw new ParseException("Row is required to have at least " + minimumRecordSize +
+                    " columns, but only has " + record.size() + ".",
                     record.getRecordNumber());
         }
 
@@ -62,7 +63,14 @@ public class DataRecordReader implements Closeable {
             timestampString = record.get(dateColumn);
         }
 
-        Timestamp timestamp = formatter.parse(timestampString);
+        Timestamp timestamp;
+        try {
+            timestamp = formatter.parse(timestampString);
+
+        } catch (DateTimeParseException e) {
+            throw new ParseException("Date/time format is not valid: '" + timestampString + "'.",
+                    record.getRecordNumber());
+        }
 
         // Build a list with each value that does not correspond to an ignored column (date and time are
         // also ignored) - values are parsed into doubles

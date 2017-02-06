@@ -9,13 +9,14 @@
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane fx:id="mainPain" hgap="5.0" prefHeight="460.0" prefWidth="885.0" vgap="5.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.Controller">
+<GridPane fx:id="mainPain" hgap="5.0" vgap="10.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.main.Controller">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
-    <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="645.0" />
+    <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="455.0" />
       <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="10.0" />
       <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
       <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -35,17 +36,17 @@
          </GridPane.margin>
       </Button>
       <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseHeadersFile" text="Choose" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-      <GridPane alignment="TOP_RIGHT" hgap="5.0" maxWidth="1.7976931348623157E308" prefHeight="332.0" prefWidth="894.0" vgap="5.0" GridPane.columnSpan="6" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+      <GridPane alignment="TOP_RIGHT" hgap="5.0" maxWidth="1.7976931348623157E308" vgap="10.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
         <columnConstraints>
           <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
             <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="75.0" />
             <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
           <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="175.0" />
-            <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="65.0" />
-            <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
             <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="10.0" />
             <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
+            <ColumnConstraints />
+            <ColumnConstraints />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER" />
@@ -60,11 +61,15 @@
             <Spinner fx:id="periodSpinner" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <ChoiceBox fx:id="periodUnitChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <Label text="Time Format:" GridPane.columnIndex="3" />
-            <Label text="Delimiter:" GridPane.columnIndex="5" />
             <ChoiceBox fx:id="timeFormatChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="4" />
-            <ChoiceBox fx:id="delimiterChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="6" />
-            <VBox maxWidth="-Infinity" prefHeight="65.0" prefWidth="94.0" spacing="5.0" GridPane.columnIndex="8" GridPane.rowIndex="2" />
-            <PreviewTable fx:id="previewTable" maxWidth="1.7976931348623157E308" minHeight="30.0" GridPane.columnSpan="9" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+            <VBox maxWidth="-Infinity" prefHeight="65.0" prefWidth="94.0" spacing="5.0" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+            <PreviewTable fx:id="previewTable" maxWidth="1.7976931348623157E308" minHeight="30.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="1">
+               <children>
+                  <Label minWidth="-Infinity" prefHeight="16.0" prefWidth="137.0" text="Date/Time Delimiter:" />
+                  <ChoiceBox fx:id="delimiterChoiceBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0" />
+               </children>
+            </HBox>
          </children>
          <GridPane.margin>
             <Insets />
