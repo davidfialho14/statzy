@@ -83,7 +83,7 @@ public class RecordParserTest {
         parser.parseRecord();
 
         catcher.expect(ParseException.class);
-        catcher.expectMessage("Record has 3 values, but 4 values were expected.");
+        catcher.expectMessage("Row has 3 columns, but 4 were expected.");
         parser.parseRecord();
     }
 

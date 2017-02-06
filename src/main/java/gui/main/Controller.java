@@ -349,9 +349,13 @@ public class Controller implements Initializable {
 
             previewTable.setData(previewRecords);
 
-        } catch (IOException | IllegalRecordSizeException | PreviewException e) {
+        } catch (IOException | PreviewException e) {
             dataFileTextField.setInvalid();
             errorAlert(e.getMessage(), "Data Preview Error").showAndWait();
+
+        } catch (IllegalRecordSizeException e) {
+            errorAlert("Data file probably has an error in line " + e.getErrorOffset() + ". " +
+                    e.getMessage(), "Data Preview Error").showAndWait();
         }
     }
 
@@ -361,9 +365,13 @@ public class Controller implements Initializable {
             List<String> headers = parser.parse();
             previewTable.setHeaders(headers);
 
-        } catch (IOException | ParseException | PreviewException e) {
+        } catch (IOException | PreviewException e) {
             headersFileTextField.setInvalid();
             errorAlert(e.getMessage(), "Headers Preview Error").showAndWait();
+
+        } catch (ParseException e) {
+            errorAlert("Headers file probably has an error in line " + e.getErrorOffset() + ". " +
+                    e.getMessage(), "Headers Preview Error").showAndWait();
         }
 
     }
