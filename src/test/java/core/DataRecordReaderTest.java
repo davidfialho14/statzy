@@ -114,7 +114,7 @@ public class DataRecordReaderTest {
 
     @Test
     public void
-    read_RecordWithInvalidDate_ThrowsDateTimeParseException() throws Exception {
+    read_RecordWithInvalidDate_ThrowsParseException() throws Exception {
         RecordParser parserStub = fakeParser(
                 record("09-08-2016", "11:22:01", "176"));
 
@@ -125,7 +125,7 @@ public class DataRecordReaderTest {
                 .withTimePattern("HH:mm:ss")
                 .build();
 
-        catcher.expect(DateTimeParseException.class);
+        catcher.expect(ParseException.class);
         recordReader.read();
     }
 
