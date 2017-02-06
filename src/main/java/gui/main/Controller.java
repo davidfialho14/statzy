@@ -16,10 +16,15 @@ import org.apache.commons.lang3.text.WordUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Controller implements Initializable {
 
@@ -32,7 +37,6 @@ public class Controller implements Initializable {
     @FXML private GridPane mainPain;
     @FXML private InputFileTextField dataFileTextField;
     @FXML private InputFileTextField headersFileTextField;
-    @FXML private OutputFileTextField outputFileTextField;
     @FXML private ChoiceBox<String> dateFormatChoiceBox;
     @FXML private ChoiceBox<String> timeFormatChoiceBox;
     @FXML private ChoiceBox<DelimiterOption> delimiterChoiceBox;
@@ -47,6 +51,8 @@ public class Controller implements Initializable {
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    private static final String TEMP_FILE_NAME = "output";
+    private File tempOutputFile = new File(TEMP_FILE_NAME);
     private final FileChooser fileChooser = new FileChooser();
 
     private static final String[] DATE_FORMATS = {
@@ -84,7 +90,6 @@ public class Controller implements Initializable {
         // image must be updated for each file!
         dataFileTextField.updateImage();
         headersFileTextField.updateImage();
-        outputFileTextField.updateImage();
 
         // Ensure the data file controls are enabled when the data and headers file are both valid, and
         // disabled if otherwise. Also, ensure the run button is only enabled if the data, headers, and
@@ -92,16 +97,12 @@ public class Controller implements Initializable {
 
         dataFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
             setDisableDataFileControls(!(isValid && headersFileTextField.isValid()));
-            runButton.setDisable(!(isValid && outputFileTextField.isValid() && headersFileTextField.isValid()));
+            runButton.setDisable(!(isValid && headersFileTextField.isValid()));
         });
 
         headersFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
             setDisableDataFileControls(!(isValid && dataFileTextField.isValid()));
-            runButton.setDisable(!(isValid && dataFileTextField.isValid() && outputFileTextField.isValid()));
-        });
-
-        outputFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
-            runButton.setDisable(!(isValid && dataFileTextField.isValid() && headersFileTextField.isValid()));
+            runButton.setDisable(!(isValid && dataFileTextField.isValid()));
         });
 
         headersFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
@@ -252,15 +253,9 @@ public class Controller implements Initializable {
         return file;
     }
 
-    public void chooseOutputPath(ActionEvent actionEvent) {
-        File file = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
-
-        if (file != null) {
-            outputFileTextField.setFile(file);
-        }
-    }
-
     public void run(ActionEvent actionEvent) throws IOException {
+
+        tempOutputFile = File.createTempFile(TEMP_FILE_NAME, null);
 
         DataRecordReader.Builder readerBuilder = DataRecordReader.with(dataFileTextField.getFile())
                 .withDateInColumn(previewTable.getDateColumn())
@@ -270,7 +265,7 @@ public class Controller implements Initializable {
                 .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
                 .ignoreColumns(previewTable.getIgnoredColumns());
 
-        DataFileWriter.Builder writerBuilder = DataFileWriter.outputTo(outputFileTextField.getFile())
+        DataFileWriter.Builder writerBuilder = DataFileWriter.outputTo(tempOutputFile)
                 .withDatePattern(dateFormatChoiceBox.getValue())
                 .withTimePattern(timeFormatChoiceBox.getValue())
                 .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
@@ -285,12 +280,21 @@ public class Controller implements Initializable {
         progressDialog.messageProperty().bind(task.messageProperty());
         task.setOnSucceeded(event -> {
             progressDialog.onFinished();
-            progressDialog.setMessage("Save to '" + outputFileTextField.getFile().getName() + "'");
+            progressDialog.setMessage("Press 'save' to select where to save the result.");
         });
         task.setOnFailed(event -> progressDialog.onFailed());
 
         // start the task in the background
         new Thread(task).start();
+
+        // prompt the user with a save dialog when the progress dialog is closed
+        progressDialog.setOnHidden(event -> {
+            try {
+                save();
+            } catch (IOException e) {
+                errorAlert("Failed to save file: " + e.getMessage(), "Save Error");
+            }
+        });
 
         progressDialog.showAndWait();
     }
@@ -359,4 +363,17 @@ public class Controller implements Initializable {
         return alert;
     }
 
+    /**
+     * Presents the user with a save dialog to select the file where to store the output file. Once the
+     * user selects the output file then it moves the temporary file into the new path.
+     *
+     * @throws IOException if an I/O error occurs.
+     */
+    public void save() throws IOException {
+        File saveFile = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
+
+        if (saveFile != null) {
+            Files.move(tempOutputFile.toPath(), saveFile.toPath(), REPLACE_EXISTING);
+        }
+    }
 }

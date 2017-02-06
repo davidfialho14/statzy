@@ -36,7 +36,8 @@
     </VBox>
     <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2">
       <children>
-      <Button fx:id="confirmButton" disable="true" minWidth="80.0" mnemonicParsing="false" onAction="#confirm" text="Ok" HBox.hgrow="NEVER">
+      <Button fx:id="saveButton" disable="true" minWidth="80.0" mnemonicParsing="false" onAction="#save"
+              text="Save" HBox.hgrow="NEVER">
         <HBox.margin>
           <Insets left="15.0" />
         </HBox.margin>
