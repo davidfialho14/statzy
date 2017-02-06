@@ -2,12 +2,16 @@ package core;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The statistics generator is the 'engine' behind statzy. Reads the data records from the input file,
  * computes the statistics and outputs the results into the data file writer.
  */
 public class StatisticsGenerator {
+
+    private final List<ProgressListener> listeners = new ArrayList<>();
 
     /**
      * This method is the entry point to process an input file, compute the statistics and output the
@@ -31,6 +35,7 @@ public class StatisticsGenerator {
 
         Timestamp currentPeriod = record.getTimestamp().truncatedTo(period.getUnit());
         Timestamp nextPeriod = currentPeriod.plus(period);
+        notifyProcessingPeriod(currentPeriod, nextPeriod);
 
         while (record != null) {
 
@@ -42,6 +47,7 @@ public class StatisticsGenerator {
 
                 currentPeriod = nextPeriod;
                 nextPeriod = currentPeriod.plus(period);
+                notifyProcessingPeriod(currentPeriod, nextPeriod);
             }
 
             groupStatistics.addEntry(record.getDataValues());
@@ -53,6 +59,28 @@ public class StatisticsGenerator {
                     groupStatistics.getStandardDeviations());
         }
 
+    }
+
+    /**
+     * Adds a new progress listener to be notified of progress updates.
+     *
+     * @param listener the listener to add.
+     */
+    public void addListener(ProgressListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Removes a progress listener from the list of listeners to be notified of progress updates.
+     *
+     * @param listener the listener to remove.
+     */
+    public void removeListener(ProgressListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyProcessingPeriod(Timestamp lowerBound, Timestamp upperBound) {
+        listeners.forEach(listener -> listener.notifyProcessingPeriod(lowerBound, upperBound));
     }
 
 }
