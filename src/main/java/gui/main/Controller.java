@@ -1,24 +1,30 @@
 package gui.main;
 
 import core.*;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Controller implements Initializable {
 
@@ -31,7 +37,6 @@ public class Controller implements Initializable {
     @FXML private GridPane mainPain;
     @FXML private InputFileTextField dataFileTextField;
     @FXML private InputFileTextField headersFileTextField;
-    @FXML private OutputFileTextField outputFileTextField;
     @FXML private ChoiceBox<String> dateFormatChoiceBox;
     @FXML private ChoiceBox<String> timeFormatChoiceBox;
     @FXML private ChoiceBox<DelimiterOption> delimiterChoiceBox;
@@ -46,6 +51,8 @@ public class Controller implements Initializable {
      *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    private static final String TEMP_FILE_NAME = "output";
+    private File tempOutputFile = new File(TEMP_FILE_NAME);
     private final FileChooser fileChooser = new FileChooser();
 
     private static final String[] DATE_FORMATS = {
@@ -56,6 +63,8 @@ public class Controller implements Initializable {
     private static final String[] TIME_FORMATS = {
             "HH:mm:ss", "HHmmss", "HH:mm"
     };
+
+    private static final String HEADERS_TAG = "headers";
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -81,7 +90,6 @@ public class Controller implements Initializable {
         // image must be updated for each file!
         dataFileTextField.updateImage();
         headersFileTextField.updateImage();
-        outputFileTextField.updateImage();
 
         // Ensure the data file controls are enabled when the data and headers file are both valid, and
         // disabled if otherwise. Also, ensure the run button is only enabled if the data, headers, and
@@ -89,16 +97,12 @@ public class Controller implements Initializable {
 
         dataFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
             setDisableDataFileControls(!(isValid && headersFileTextField.isValid()));
-            runButton.setDisable(!(isValid && outputFileTextField.isValid() && headersFileTextField.isValid()));
+            runButton.setDisable(!(isValid && headersFileTextField.isValid()));
         });
 
         headersFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
             setDisableDataFileControls(!(isValid && dataFileTextField.isValid()));
-            runButton.setDisable(!(isValid && dataFileTextField.isValid() && outputFileTextField.isValid()));
-        });
-
-        outputFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
-            runButton.setDisable(!(isValid && dataFileTextField.isValid() && headersFileTextField.isValid()));
+            runButton.setDisable(!(isValid && dataFileTextField.isValid()));
         });
 
         headersFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
@@ -129,6 +133,88 @@ public class Controller implements Initializable {
         periodSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
 
+        // setup required conditions to accept files by drag and drop
+        previewTable.setOnDragOver(event -> {
+
+            // The preview table accepts dropping 1 or 2 files
+            // If only 1 file is being dropped, then it accepts any files
+            // If 2 files are dropped, then it requires that one of them is an headers file and the other a
+            // data file
+
+            List<File> droppedFiles = event.getDragboard().getFiles();
+            if (droppedFiles != null) {
+                if (droppedFiles.size() == 1
+                        || (droppedFiles.size() == 2
+                            && (isHeadersFile(droppedFiles.get(0))
+                                ^ isHeadersFile(droppedFiles.get(1))))) {
+
+                    event.acceptTransferModes(TransferMode.ANY);
+                    event.consume();
+                }
+
+            }
+
+        });
+
+        // process the dropped file(s)
+        previewTable.setOnDragDropped(event -> {
+
+            List<File> droppedFiles = event.getDragboard().getFiles();
+            File droppedFile = event.getDragboard().getFiles().get(0);
+
+            if (droppedFiles.size() == 2) {
+                // an headers and data file were dropped
+                File secondDroppedFile = event.getDragboard().getFiles().get(1);
+
+                File headersFile, dataFile;
+                if (isHeadersFile(droppedFile)) {
+                    headersFile = droppedFile;
+                    dataFile = secondDroppedFile;
+                } else {
+                    headersFile = secondDroppedFile;
+                    dataFile = droppedFile;
+                }
+
+                // must ensure that the previous headers and data file are cleared before setting new
+                // headers and data files - this avoids conflicts with the previous files
+                headersFileTextField.clear();
+                dataFileTextField.clear();
+
+                headersFileTextField.setFile(headersFile);
+                previewHeaders();
+                dataFileTextField.setFile(dataFile);
+                previewData();
+
+            } else {
+                // only one file was dropped - it may be an headers or data file
+
+                if (isHeadersFile(droppedFile)) {
+                    headersFileTextField.setFile(droppedFile);
+                    previewHeaders();
+                } else{
+                    dataFileTextField.setFile(droppedFile);
+                    previewData();
+                }
+
+            }
+
+            event.setDropCompleted(true);
+            event.consume();
+
+        });
+
+    }
+
+    /**
+     * Checks if a file corresponds to an headers file. A file is considered an headers file if its name
+     * (excluding the extension) ends with the headers tag.
+     *
+     * @param file the file to check, not null.
+     * @return true is the file is an headers file, and false if otherwise.
+     */
+    private static boolean isHeadersFile(File file) {
+        String filename = FilenameUtils.getBaseName(file.getName());
+        return filename.toLowerCase().endsWith(HEADERS_TAG);
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -167,62 +253,50 @@ public class Controller implements Initializable {
         return file;
     }
 
-    public void chooseOutputPath(ActionEvent actionEvent) {
-        File file = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
+    public void run(ActionEvent actionEvent) throws IOException {
 
-        if (file != null) {
-            outputFileTextField.setFile(file);
-        }
-    }
+        tempOutputFile = File.createTempFile(TEMP_FILE_NAME, null);
 
-    public void run(ActionEvent actionEvent) {
+        DataRecordReader.Builder readerBuilder = DataRecordReader.with(dataFileTextField.getFile())
+                .withDateInColumn(previewTable.getDateColumn())
+                .withDatePattern(dateFormatChoiceBox.getValue())
+                .withTimeInColumn(previewTable.getTimeColumn())
+                .withTimePattern(timeFormatChoiceBox.getValue())
+                .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
+                .ignoreColumns(previewTable.getIgnoredColumns());
 
-        Headers headers;
-        try (HeadersReader headersReader = new HeadersReader(headersFileTextField.getFile(),
-                previewTable.getDateColumn(), previewTable.getTimeColumn(),
-                previewTable.getIgnoredColumns())) {
+        DataFileWriter.Builder writerBuilder = DataFileWriter.outputTo(tempOutputFile)
+                .withDatePattern(dateFormatChoiceBox.getValue())
+                .withTimePattern(timeFormatChoiceBox.getValue())
+                .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
+                .inSameColumn(previewTable.getDateColumn() == previewTable.getTimeColumn());
 
-            headers = headersReader.read();
+        StatisticsTask task = new StatisticsTask(
+                headersFileTextField.getFile(), previewTable.getDateColumn(), previewTable.getTimeColumn(),
+                previewTable.getIgnoredColumns(), readerBuilder, writerBuilder,
+                Period.of(periodSpinner.getValue(), periodUnitChoiceBox.getValue()));
 
-        } catch (IOException e) {
-            errorAlert(e.getMessage(), "Headers File Error").showAndWait();
-            return;
-        } catch (ParseException e) {
-            errorAlert("Headers file probably has an error in line " + e.getErrorOffset() + ".\n" +
-                    e.getMessage(), "Process Error").showAndWait();
-            return;
-        }
+        ProgressDialog progressDialog = new ProgressDialog(mainPain.getScene().getWindow());
+        progressDialog.messageProperty().bind(task.messageProperty());
+        task.setOnSucceeded(event -> {
+            progressDialog.onFinished();
+            progressDialog.setMessage("Press 'save' to select where to save the result.");
+        });
+        task.setOnFailed(event -> progressDialog.onFailed());
 
-        try (
-                DataRecordReader reader = DataRecordReader.with(dataFileTextField.getFile())
-                        .withDateInColumn(previewTable.getDateColumn())
-                        .withDatePattern(dateFormatChoiceBox.getValue())
-                        .withTimeInColumn(previewTable.getTimeColumn())
-                        .withTimePattern(timeFormatChoiceBox.getValue())
-                        .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
-                        .ignoreColumns(previewTable.getIgnoredColumns())
-                        .build();
+        // start the task in the background
+        new Thread(task).start();
 
-                DataFileWriter writer = DataFileWriter.outputTo(outputFileTextField.getFile())
-                        .withHeaders(headers)
-                        .withDatePattern(dateFormatChoiceBox.getValue())
-                        .withTimePattern(timeFormatChoiceBox.getValue())
-                        .delimitedBy(delimiterChoiceBox.getSelectionModel().getSelectedItem().getDelimiter())
-                        .inSameColumn(previewTable.getDateColumn() == previewTable.getTimeColumn())
-                        .build()
-        ) {
+        // prompt the user with a save dialog when the progress dialog is closed
+        progressDialog.setOnHidden(event -> {
+            try {
+                save();
+            } catch (IOException e) {
+                errorAlert("Failed to save file: " + e.getMessage(), "Save Error");
+            }
+        });
 
-            StatisticsGenerator statisticsGenerator = new StatisticsGenerator();
-            statisticsGenerator.process(reader, writer, Period.of(periodSpinner.getValue(),
-                    periodUnitChoiceBox.getValue()));
-
-        } catch (IOException e) {
-            errorAlert(e.getMessage(), "Process Error").showAndWait();
-        } catch (ParseException e) {
-            errorAlert("Data file probably has an error in line " + e.getErrorOffset() + ".\n" +
-                            e.getMessage(), "Process Error").showAndWait();
-        }
-
+        progressDialog.showAndWait();
     }
 
     /**
@@ -289,4 +363,17 @@ public class Controller implements Initializable {
         return alert;
     }
 
+    /**
+     * Presents the user with a save dialog to select the file where to store the output file. Once the
+     * user selects the output file then it moves the temporary file into the new path.
+     *
+     * @throws IOException if an I/O error occurs.
+     */
+    public void save() throws IOException {
+        File saveFile = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
+
+        if (saveFile != null) {
+            Files.move(tempOutputFile.toPath(), saveFile.toPath(), REPLACE_EXISTING);
+        }
+    }
 }

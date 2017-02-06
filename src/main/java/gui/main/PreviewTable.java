@@ -3,7 +3,6 @@ package gui.main;
 import com.sun.javafx.collections.ObservableSetWrapper;
 import core.Record;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableSet;
@@ -11,8 +10,10 @@ import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.TextAlignment;
 
 import java.io.IOException;
 import java.net.URL;
@@ -63,6 +64,9 @@ public class PreviewTable extends GridPane implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        // disable selection
+        tableView.setSelectionModel(null);
+
         // Ensure the selected columns are updated every time a new date/time/ignore column is selected
         dateColumn.addListener((observable, oldValue, newValue) -> tableView.refresh());
         timeColumn.addListener((observable, oldValue, newValue) -> tableView.refresh());
@@ -80,7 +84,9 @@ public class PreviewTable extends GridPane implements Initializable {
         private final PreviewTableColumn column;
 
         private PreviewTableCell(PreviewTableColumn column) {
+            super();
             this.column = column;
+            setAlignment(Pos.CENTER);
         }
 
         @Override

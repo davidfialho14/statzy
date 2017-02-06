@@ -14,7 +14,7 @@ public class StatzyApplication extends Application {
 
         primaryStage.setTitle("Statzy");
         primaryStage.setScene(new Scene(root));
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.show();
     }
 
