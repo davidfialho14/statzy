@@ -72,8 +72,7 @@ public class DataRecordReaderTest {
                 .build();
 
         catcher.expect(ParseException.class);
-        catcher.expectMessage("Record has less values than expected: it is required to have at least 3 " +
-                "values, but has only 2.");
+        catcher.expectMessage("Row is required to have at least 3 columns, but only has 2.");
         recordReader.read();
     }
 
@@ -90,8 +89,7 @@ public class DataRecordReaderTest {
                 .build();
 
         catcher.expect(ParseException.class);
-        catcher.expectMessage("Record has less values than expected: it is required to have at least 11 " +
-                "values, but has only 2.");
+        catcher.expectMessage("Row is required to have at least 11 columns, but only has 2.");
         recordReader.read();
     }
 

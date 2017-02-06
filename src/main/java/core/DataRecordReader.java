@@ -51,8 +51,8 @@ public class DataRecordReader implements Closeable {
         // check if the record contains enough values - see documentation for the getMinimumRecordSize()
         int minimumRecordSize = getMinimumRecordSize();
         if (record.size() < minimumRecordSize) {
-            throw new ParseException("Record has less values than expected: it is required to have " +
-                    "at least " + minimumRecordSize + " values, but has only " + record.size() + ".",
+            throw new ParseException("Row is required to have at least " + minimumRecordSize +
+                    " columns, but only has " + record.size() + ".",
                     record.getRecordNumber());
         }
 
