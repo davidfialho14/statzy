@@ -37,7 +37,6 @@ public class Controller implements Initializable {
     @FXML private GridPane mainPain;
     @FXML private InputFileTextField dataFileTextField;
     @FXML private InputFileTextField headersFileTextField;
-    @FXML private OutputFileTextField outputFileTextField;
     @FXML private ChoiceBox<String> dateFormatChoiceBox;
     @FXML private ChoiceBox<String> timeFormatChoiceBox;
     @FXML private ChoiceBox<DelimiterOption> delimiterChoiceBox;
@@ -91,7 +90,6 @@ public class Controller implements Initializable {
         // image must be updated for each file!
         dataFileTextField.updateImage();
         headersFileTextField.updateImage();
-        outputFileTextField.updateImage();
 
         // Ensure the data file controls are enabled when the data and headers file are both valid, and
         // disabled if otherwise. Also, ensure the run button is only enabled if the data, headers, and
@@ -99,16 +97,12 @@ public class Controller implements Initializable {
 
         dataFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
             setDisableDataFileControls(!(isValid && headersFileTextField.isValid()));
-            runButton.setDisable(!(isValid && outputFileTextField.isValid() && headersFileTextField.isValid()));
+            runButton.setDisable(!(isValid && headersFileTextField.isValid()));
         });
 
         headersFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
             setDisableDataFileControls(!(isValid && dataFileTextField.isValid()));
-            runButton.setDisable(!(isValid && dataFileTextField.isValid() && outputFileTextField.isValid()));
-        });
-
-        outputFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
-            runButton.setDisable(!(isValid && dataFileTextField.isValid() && headersFileTextField.isValid()));
+            runButton.setDisable(!(isValid && dataFileTextField.isValid()));
         });
 
         headersFileTextField.validityProperty().addListener((observable, wasValid, isValid) -> {
@@ -259,14 +253,6 @@ public class Controller implements Initializable {
         return file;
     }
 
-    public void chooseOutputPath(ActionEvent actionEvent) {
-        File file = fileChooser.showSaveDialog(mainPain.getScene().getWindow());
-
-        if (file != null) {
-            outputFileTextField.setFile(file);
-        }
-    }
-
     public void run(ActionEvent actionEvent) throws IOException {
 
         tempOutputFile = File.createTempFile(TEMP_FILE_NAME, null);
@@ -294,7 +280,7 @@ public class Controller implements Initializable {
         progressDialog.messageProperty().bind(task.messageProperty());
         task.setOnSucceeded(event -> {
             progressDialog.onFinished();
-            progressDialog.setMessage("Save to '" + outputFileTextField.getFile().getName() + "'");
+            progressDialog.setMessage("Press 'save' to select where to save the result.");
         });
         task.setOnFailed(event -> progressDialog.onFailed());
 
